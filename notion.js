@@ -51,6 +51,47 @@ values.createNewDay = async () => {
   await notionInstance.post('/pages', body);
 };
 
+values.createNewWeek = async () => {
+  const startDate = localTime().weekday(1);
+  const endDate = localTime().weekday(7);
+  const startDateTitle = startDate.format('MMM D');
+  const endDateTitle = endDate.format('MMM D');
+  
+  const title = `${startDateTitle}-${endDateTitle}`
+
+  let {id: sectionId } = await values.getLatestSection()
+  const body = {
+    parent: {
+      database_id: process.env.WEEK_DATABASE_ID,
+    },
+    properties: {
+      Dates: {
+        title: [
+          {
+            text: {
+              content: title,
+            },
+          },
+        ],
+      },
+      Date: {
+        date: {
+          start: onlyDate(startDate),
+          end: onlyDate(endDate)
+        },
+      },
+      Section: {
+        relation: [
+          {
+            id: sectionId,
+          },
+        ],
+      },
+    },
+  };
+  await notionInstance.post('/pages', body);
+};
+
 values.getWeekOf = async (date) => {
   const result = await notionInstance.post(
     `/databases/${process.env.WEEK_DATABASE_ID}/query`,
@@ -71,6 +112,17 @@ values.getWeekOf = async (date) => {
           },
         ],
       },
+      sorts: [{ property: 'Date', direction: 'descending' }],
+      page_size: 1,
+    },
+  );
+  return result.data.results[0];
+};
+
+values.getLatestSection = async () => {
+  const result = await notionInstance.post(
+    `/databases/${process.env.SECTION_DATABASE_ID}/query`,
+    {
       sorts: [{ property: 'Date', direction: 'descending' }],
       page_size: 1,
     },
