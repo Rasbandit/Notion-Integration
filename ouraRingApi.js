@@ -20,8 +20,8 @@ values.getSleepData = async (date) => {
   const response = await ouraInstance.get(`/sleep?start=${previousDay}&end=${currentDay}`)
   const sleepData = response.data.sleep[0]
 
-  const startTime = moment(sleepData.bedtime_start)
-  const endTime = moment(sleepData.bedtime_end)
+  const startTime = moment(sleepData.bedtime_start).tz(process.env.TIME_ZONE)
+  const endTime = moment(sleepData.bedtime_end).tz(process.env.TIME_ZONE)
 
   let sleepStartHour = +startTime.format("HH")
   const sleepStartMinute = +startTime.format("m")
@@ -50,7 +50,7 @@ values.getSleepData = async (date) => {
 const getMinutes = (seconds) => {
   const [hours, minutes] = `${seconds/60/60}`.split(".")
   const percentMinutes = +minutes.substring(0,2)
-  return (percentMinutes/100)*60
+  return Math.round((percentMinutes/100)*60)
 }
 
 module.exports = values
