@@ -18,6 +18,7 @@ const onlyDate = (date) => date.format().split('T')[0];
 
 values.createNewDay = async () => {
   const todaysDate = localTime();
+  const date = onlyDate(todaysDate);
   const title = todaysDate.format('MMM D, YYYY');
   const { id: weekId } = await values.getWeekOf(todaysDate);
   const body = {
@@ -36,7 +37,7 @@ values.createNewDay = async () => {
       },
       Date: {
         date: {
-          start: onlyDate(todaysDate),
+          start: date,
         },
       },
       Week: {
