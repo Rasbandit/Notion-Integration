@@ -1,6 +1,8 @@
 const axios = require('axios');
 const moment = require('moment-timezone');
-const {getSleepData} = require('./ouraRingApi')
+var mfp = require('mfp');
+
+const { getSleepData } = require('./ouraRingApi');
 
 const notionInstance = axios.create({
   baseURL: 'https://api.notion.com/v1',
@@ -57,10 +59,10 @@ values.createNewWeek = async () => {
   const endDate = localTime().weekday(7);
   const startDateTitle = startDate.format('MMM D');
   const endDateTitle = endDate.format('MMM D');
-  
-  const title = `${startDateTitle}-${endDateTitle}`
 
-  let {id: sectionId } = await values.getLatestSection()
+  const title = `${startDateTitle}-${endDateTitle}`;
+
+  let { id: sectionId } = await values.getLatestSection();
   const body = {
     parent: {
       database_id: process.env.WEEK_DATABASE_ID,
@@ -78,7 +80,7 @@ values.createNewWeek = async () => {
       Date: {
         date: {
           start: onlyDate(startDate),
-          end: onlyDate(endDate)
+          end: onlyDate(endDate),
         },
       },
       Section: {
@@ -97,7 +99,7 @@ values.getWeekOf = async (date) => {
   const result = await notionInstance.post(
     `/databases/${process.env.WEEK_DATABASE_ID}/query`,
     {
-      filters: {
+      filter: {
         and: [
           {
             property: 'Date',
@@ -115,7 +117,7 @@ values.getWeekOf = async (date) => {
       },
       sorts: [{ property: 'Date', direction: 'descending' }],
       page_size: 1,
-    },
+    }
   );
   return result.data.results[0];
 };
@@ -126,7 +128,7 @@ values.getLatestSection = async () => {
     {
       sorts: [{ property: 'Date', direction: 'descending' }],
       page_size: 1,
-    },
+    }
   );
   return result.data.results[0];
 };
@@ -135,38 +137,60 @@ values.getDay = async (date) => {
   const result = await notionInstance.post(
     `/databases/${process.env.DAY_DATABASE_ID}/query`,
     {
-      filters: {
-        and: [
-          {
-            property: 'Date',
-            date: {
-              equal: date.format("YYYY-MM-DD"),
-            },
-          },
-        ],
+      filter: {
+        property: 'Date',
+        date: {
+          equals: date.format('YYYY-MM-DD'),
+        },
       },
       sorts: [{ property: 'Date', direction: 'descending' }],
       page_size: 1,
-    },
+    }
   );
   return result.data.results[0];
-}
+};
 
 values.setSleepData = async () => {
-  const {id} = await values.getDay(localTime())
-  let sleepData = await getSleepData(moment());
-  
-  await notionInstance.patch(`/pages/${id}`, {
-    properties: {
-      "Sleep Start Hour": sleepData.sleepStartHour,
-      "Sleep Start Minute": sleepData.sleepStartMinute,
-      "Awake Hour": sleepData.sleepEndHour,
-      "Awake Minute": sleepData.sleepEndMinute,
-      "Total Sleep Hour": sleepData.totalSleepHour,
-      "Total Sleep Minute": sleepData.totalSleepMinuets,
-      "Sleep Score": sleepData.score
-    }
-  })
-}
+  for(let i = 0; i < 2; i++) {
+    let date = localTime().subtract(i, 'day');
+    const { id } = await values.getDay(date);
+    let sleepData = await getSleepData(date);
+    
+    await notionInstance.patch(`/pages/${id}`, {
+      properties: {
+        'Sleep Start Hour': sleepData.sleepStartHour,
+        'Sleep Start Minute': sleepData.sleepStartMinute,
+        'Awake Hour': sleepData.sleepEndHour,
+        'Awake Minute': sleepData.sleepEndMinute,
+        'Total Sleep Hour': sleepData.totalSleepHour,
+        'Total Sleep Minute': sleepData.totalSleepMinuets,
+        'Sleep Score': sleepData.score,
+      },
+    });
+  }
+};
+
+values.setEatingData = async () => {
+  for (let i = 0; i < 4; i++) {
+    let date = localTime().subtract(i, 'day');
+    let { id: dayId } = await values.getDay(date);
+    mfp.fetchSingleDate(
+      'rasbandit',
+      date.format('YYYY-MM-DD'),
+      'all',
+      function (response) {
+        notionInstance.patch(`/pages/${dayId}`, {
+          properties: {
+            // Water: response.water,
+            Calories: response.calories,
+            Protein: response.protein,
+            Carbs: response.carbs,
+            Fat: response.fat
+          },
+        });
+      }
+    );
+  }
+};
 
 module.exports = values;
