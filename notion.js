@@ -96,24 +96,15 @@ values.createNewWeek = async () => {
 };
 
 values.getWeekOf = async (date) => {
+  date = date.startOf('isoWeek');
   const result = await notionInstance.post(
     `/databases/${process.env.WEEK_DATABASE_ID}/query`,
     {
       filter: {
-        and: [
-          {
-            property: 'Date',
-            date: {
-              on_or_after: date.weekday(1),
-            },
-          },
-          {
-            property: 'Date',
-            date: {
-              on_or_before: date.weekday(7),
-            },
-          },
-        ],
+        property: 'Date',
+        date: {
+          equals: date.weekday(1),
+        },
       },
       sorts: [{ property: 'Date', direction: 'descending' }],
       page_size: 1,
@@ -151,11 +142,11 @@ values.getDay = async (date) => {
 };
 
 values.setSleepData = async () => {
-  for(let i = 0; i < 2; i++) {
+  for (let i = 0; i < 2; i++) {
     let date = localTime().subtract(i, 'day');
     const { id } = await values.getDay(date);
     let sleepData = await getSleepData(date);
-    
+
     await notionInstance.patch(`/pages/${id}`, {
       properties: {
         'Sleep Start Hour': sleepData.sleepStartHour,
@@ -171,7 +162,7 @@ values.setSleepData = async () => {
 };
 
 values.setEatingData = async () => {
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 7; i++) {
     let date = localTime().subtract(i, 'day');
     let { id: dayId } = await values.getDay(date);
     mfp.fetchSingleDate(
@@ -185,12 +176,14 @@ values.setEatingData = async () => {
             Calories: response.calories,
             Protein: response.protein,
             Carbs: response.carbs,
-            Fat: response.fat
+            Fat: response.fat,
           },
         });
       }
     );
   }
 };
+
+values.setEatingData()
 
 module.exports = values;
