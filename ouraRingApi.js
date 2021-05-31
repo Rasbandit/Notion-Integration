@@ -16,8 +16,7 @@ const values = {}
 
 values.getSleepData = async (date) => {
   const previousDay = date.subtract(1, "days").format("YYYY-MM-DD")
-  const currentDay = date.add(1, "days").format("YYYY-MM-DD")
-  const response = await ouraInstance.get(`/sleep?start=${previousDay}&end=${currentDay}`)
+  const response = await ouraInstance.get(`/sleep?start=${previousDay}`)
   const sleepData = response.data.sleep[0]
 
   const startTime = moment(sleepData.bedtime_start).tz(process.env.TIME_ZONE)
