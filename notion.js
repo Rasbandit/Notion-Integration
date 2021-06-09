@@ -55,8 +55,8 @@ values.createNewDay = async () => {
 };
 
 values.createNewWeek = async () => {
-  const startDate = localTime().weekday(1);
-  const endDate = localTime().weekday(7);
+  const startDate = localTime().add(2, "days").weekday(1);
+  const endDate = localTime().add(2, "days").weekday(7);
   const startDateTitle = startDate.format('MMM D');
   const endDateTitle = endDate.format('MMM D');
 
