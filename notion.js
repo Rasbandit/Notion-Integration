@@ -18,11 +18,17 @@ values = {};
 const localTime = (date) => moment(date).utcOffset(-6);
 const onlyDate = (date) => date.format().split('T')[0];
 
-values.createNewDay = async () => {
-  const todaysDate = localTime();
-  const date = onlyDate(todaysDate);
-  const title = todaysDate.format('MMM D, YYYY');
-  const { id: weekId } = await values.getWeekOf(todaysDate);
+values.createWeeksWorthOfDays = async () => {
+  for(i = 2 ; i < 9; i++) {
+    const date = localTime().add(i, "Days");
+    values.createNewDay(date)
+  }
+}
+
+values.createNewDay = async (date) => {
+  const specificDate = onlyDate(date);
+  const title = date.format('MMM D, YYYY');
+  const { id: weekId } = await values.getWeekOf(date);
   const body = {
     parent: {
       database_id: process.env.DAY_DATABASE_ID,
@@ -39,7 +45,7 @@ values.createNewDay = async () => {
       },
       Date: {
         date: {
-          start: date,
+          start: specificDate,
         },
       },
       Week: {
@@ -93,6 +99,7 @@ values.createNewWeek = async () => {
     },
   };
   await notionInstance.post('/pages', body);
+  values.createWeeksWorthOfDays();
 };
 
 values.getWeekOf = async (date) => {
@@ -187,3 +194,5 @@ values.setEatingData = async () => {
 values.setEatingData()
 
 module.exports = values;
+
+values.createWeeksWorthOfDays()
