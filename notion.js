@@ -9,6 +9,7 @@ const notionInstance = axios.create({
   headers: {
     common: {
       Authorization: `Bearer ${process.env.NOTION_AUTH_TOKEN}`,
+      "Notion-Version": `2021-05-13`
     },
   },
 });
