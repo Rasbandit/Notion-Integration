@@ -150,7 +150,7 @@ values.getDay = async (date) => {
 };
 
 values.setSleepData = async () => {
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 7; i++) {
     let date = localTime().subtract(i, 'day');
     const { id } = await values.getDay(date);
     let sleepData = await getSleepData(date);
@@ -192,8 +192,4 @@ values.setEatingData = async () => {
   }
 };
 
-values.setEatingData()
-
 module.exports = values;
-
-values.createWeeksWorthOfDays()
