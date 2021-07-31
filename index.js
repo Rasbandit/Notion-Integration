@@ -1,9 +1,17 @@
 require('dotenv').config();
 
-const CronJob = require('cron').CronJob;
+const express = require('express');
+const { startAllCrons } = require('./crons/cronTimers');
+// require('./interfaces/googleCalendarInterface')
 
-const { setSleepData, createNewWeek, setEatingData } = require('./notion');
+const app = express();
+const { PORT } = process.env;
 
-new CronJob('0 */5 * * * *', setSleepData, null, true, process.env.TIME_ZONE);
-new CronJob('0 */5 * * * *', setEatingData, null, true, process.env.TIME_ZONE);
-new CronJob('0 0 1 * * 6', createNewWeek, null, true, process.env.TIME_ZONE);
+app.get('/', function (req, res) {
+  res.send('Hello World');
+});
+
+app.listen(PORT, () => {
+  startAllCrons();
+  console.log(`Running full speed at ${PORT} MPH`)
+});
