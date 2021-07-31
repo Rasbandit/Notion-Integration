@@ -7,7 +7,8 @@ const { startAllCrons } = require('./crons/cronTimers');
 const app = express();
 const { PORT } = process.env;
 
-app.get('/', function (req, res) {
+app.get('/calendar', function (req, res) {
+  console.log('made it');
   res.send('Hello World');
 });
 
