@@ -31,13 +31,13 @@ const exportedValues = {};
 
 exportedValues.startAllCrons = () => {
   for (const cron in crons) {
-    startCron(cron);
+    exportedValues.startCron(cron);
   }
 };
 
 exportedValues.stopAllCrons = () => {
   for (const cron in crons) {
-    stopCron(cron);
+    exportedValues.stopCron(cron);
   }
 };
 
