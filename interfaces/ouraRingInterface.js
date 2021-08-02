@@ -19,6 +19,8 @@ values.getSleepData = async (date) => {
   const response = await ouraInstance.get(`/sleep?start=${previousDay}`)
   const sleepData = response.data.sleep[0]
 
+  if(!sleepData) return;
+
   const startTime = moment(sleepData.bedtime_start).tz(process.env.TIME_ZONE)
   const endTime = moment(sleepData.bedtime_end).tz(process.env.TIME_ZONE)
 

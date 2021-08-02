@@ -1,7 +1,7 @@
 const axios = require('axios');
 const moment = require('moment-timezone');
 
-const { createPage, queryDatabase } = require('../interfaces/notionInterface');
+const { createPage, queryDatabase, getPageContent } = require('../interfaces/notionInterface');
 const {
   localTime,
   onlyDate,
@@ -9,30 +9,21 @@ const {
   formatDayTitle,
 } = require('./momentHelpers');
 
-const { DAY_DATABASE_ID, WEEK_DATABASE_ID, SECTION_DATABASE_ID } = process.env;
-
-const notionInstance = axios.create({
-  baseURL: 'https://api.notion.com/v1',
-  headers: {
-    common: {
-      Authorization: `Bearer ${process.env.NOTION_AUTH_TOKEN}`,
-      'Notion-Version': `2021-05-13`,
-    },
-  },
-});
+const { DAY_DATABASE_ID, WEEK_DATABASE_ID, SECTION_DATABASE_ID, DAY_TEMPLATE_ID } = process.env;
 
 values = {};
 
 values.createDaysForWeek = async (startDate, EndDate, weekId) => {
   const formattedEndDate = moment(EndDate);
   const currentDay = moment(startDate);
+  // const {data} = await getPageContent(DAY_TEMPLATE_ID)
   while (currentDay.isSameOrBefore(formattedEndDate)) {
     values.createNewDay(currentDay, weekId);
     currentDay.add(1, 'Day');
   }
 };
 
-values.createNewDay = async (date, weekId) => {
+values.createNewDay = async (date, weekId, children = []) => {
   const properties = {
     Title: {
       title: [
@@ -56,7 +47,7 @@ values.createNewDay = async (date, weekId) => {
       ],
     },
   };
-  await createPage(DAY_DATABASE_ID, properties);
+  await createPage(DAY_DATABASE_ID, properties, children);
 };
 
 values.createNextWeek = async () => {
