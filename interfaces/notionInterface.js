@@ -12,10 +12,10 @@ const notionInstance = axios.create({
 
 const exportedValues = {};
 
-exportedValues.createPage = async (databaseId, properties, children = []) => {
+exportedValues.createPage = async (database_id, properties, children = []) => {
   const body = {
     parent: {
-      databaseId,
+      database_id,
     },
     properties,
     children,
@@ -23,9 +23,10 @@ exportedValues.createPage = async (databaseId, properties, children = []) => {
   return await notionInstance.post('/pages', body);
 };
 
-exportedValues.queryDatabase = async (databaseId, options) =>  await notionInstance.post(`/databases/${databaseId}/query`, options);
+exportedValues.queryDatabase = async (databaseId, options) =>
+  await notionInstance.post(`/databases/${databaseId}/query`, options);
 
-exportedValues.updatePage = async (pageId, options) => await notionInstance.patch(`/pages/${pageId}`, options)
-
+exportedValues.updatePage = async (pageId, options) =>
+  await notionInstance.patch(`/pages/${pageId}`, options);
 
 module.exports = exportedValues;

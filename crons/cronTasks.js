@@ -1,13 +1,9 @@
 const mfp = require('mfp');
 const { getSleepData } = require('../interfaces/ouraRingInterface');
 const { updatePage } = require('../interfaces/notionInterface');
-const { getDay } = require('../helpers/notionHelpers');
+const { getDay, createNextWeek } = require('../helpers/notionHelpers');
 
-const {
-  localTime,
-  yearMonthDayFormat,
-  createNewWeek,
-} = require('../helpers/momentHelpers');
+const { localTime, yearMonthDayFormat } = require('../helpers/momentHelpers');
 
 const exportedValues = {};
 
@@ -53,6 +49,6 @@ exportedValues.setEatingData = async () => {
   }
 };
 
-exportedValues.createNewWeek = createNewWeek;
+exportedValues.createNextWeek = createNextWeek;
 
 module.exports = exportedValues;

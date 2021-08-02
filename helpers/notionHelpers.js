@@ -1,10 +1,12 @@
 const axios = require('axios');
+const moment = require('moment-timezone');
+
 const { createPage, queryDatabase } = require('../interfaces/notionInterface');
 const {
   localTime,
   onlyDate,
   yearMonthDayFormat,
-  formatDayTitle
+  formatDayTitle,
 } = require('./momentHelpers');
 
 const { DAY_DATABASE_ID, WEEK_DATABASE_ID, SECTION_DATABASE_ID } = process.env;
@@ -21,16 +23,16 @@ const notionInstance = axios.create({
 
 values = {};
 
-values.createWeeksWorthOfDays = async () => {
-  for (i = 2; i < 9; i++) {
-    const date = localTime().add(i, 'Days');
-    values.createNewDay(date);
+values.createDaysForWeek = async (startDate, EndDate, weekId) => {
+  const formattedEndDate = moment(EndDate);
+  const currentDay = moment(startDate);
+  while (currentDay.isSameOrBefore(formattedEndDate)) {
+    values.createNewDay(currentDay, weekId);
+    currentDay.add(1, 'Day');
   }
 };
 
-values.createNewDay = async (date) => {
-  const unmutatedDate = moment(date);
-  const { id: weekId } = await values.getWeekOf(unmutatedDate);
+values.createNewDay = async (date, weekId) => {
   const properties = {
     Title: {
       title: [
@@ -57,7 +59,7 @@ values.createNewDay = async (date) => {
   await createPage(DAY_DATABASE_ID, properties);
 };
 
-values.createNewWeek = async () => {
+values.createNextWeek = async () => {
   const startDate = localTime().add(2, 'days').weekday(1);
   const endDate = localTime().add(2, 'days').weekday(7);
   const startDateTitle = startDate.format('MMM D');
@@ -90,18 +92,19 @@ values.createNewWeek = async () => {
       ],
     },
   };
-  await createPage(WEEK_DATABASE_ID, properties);
-  values.createWeeksWorthOfDays();
+  const { data } = await createPage(WEEK_DATABASE_ID, properties);
+  const { start, end } = data.properties.Date.date;
+  const weekId = data.id;
+  values.createDaysForWeek(start, end, weekId);
 };
 
 values.getWeekOf = async (date) => {
-  const unmutatedDate = moment(date);
-  startOfWeek = unmutatedDate.startOf('isoWeek');
+  date = date.startOf('isoWeek');
   const options = {
     filter: {
       property: 'Date',
       date: {
-        equals: startOfWeek.weekday(1),
+        equals: onlyDate(date.weekday(1)),
       },
     },
     sorts: [{ property: 'Date', direction: 'descending' }],
