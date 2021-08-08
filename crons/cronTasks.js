@@ -1,11 +1,25 @@
 const mfp = require('mfp');
+const storage = require('node-persist');
+
 const { getSleepData } = require('../interfaces/ouraRingInterface');
 const { updatePage } = require('../interfaces/notionInterface');
-const { getDay, createNextWeek } = require('../helpers/notionHelpers');
+const { getDay, createNextWeek } = require('../helpers/notionHelpers/notionDayAndWeekHelpers');
+const { getUpdates } = require('../interfaces/todoistInterface');
+const { processUpdates } = require('../helpers/todoistNotionProcessor');
 
 const { localTime, yearMonthDayFormat } = require('../helpers/momentHelpers');
 
 const exportedValues = {};
+
+const init = async () => {
+  if (!storage.getItem) {
+    await storage.init();
+    await storage.setItem('sync_token', '*');
+    await storage.setItem('isFirst', true);
+  }
+};
+
+init();
 
 exportedValues.setSleepData = async () => {
   for (let i = 0; i < 7; i++) {
@@ -46,6 +60,18 @@ exportedValues.setEatingData = async () => {
         });
       }
     );
+  }
+};
+
+exportedValues.getUpdatedTodoistItems = async () => {
+  const sync_token = await storage.getItem('sync_token');
+  const isFirst = await storage.getItem('isFirst');
+  let data = await getUpdates(sync_token);
+  storage.updateItem('sync_token', data.sync_token);
+  if (!isFirst) {
+    processUpdates(data);
+  } else {
+    await storage.setItem('isFirst', false);
   }
 };
 

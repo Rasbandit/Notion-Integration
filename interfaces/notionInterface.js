@@ -18,7 +18,7 @@ exportedValues.createPage = async (database_id, properties, children = []) => {
       database_id,
     },
     properties,
-    children
+    children,
   };
   return await notionInstance.post('/pages', body);
 };
@@ -29,7 +29,13 @@ exportedValues.queryDatabase = async (databaseId, options) =>
 exportedValues.updatePage = async (pageId, options) =>
   await notionInstance.patch(`/pages/${pageId}`, options);
 
+exportedValues.getPage = async (pageId) =>
+  await notionInstance.get(`/pages/${pageId}`);
+
 exportedValues.getPageContent = async (pageId) =>
   await notionInstance.get(`/blocks/${pageId}/children`);
+
+exportedValues.updateBlock = async (blockId, updates) =>
+  await notionInstance.patch(`/blocks/${blockId}`, updates);
 
 module.exports = exportedValues;

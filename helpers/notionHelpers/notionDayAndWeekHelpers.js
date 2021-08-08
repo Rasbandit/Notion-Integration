@@ -1,22 +1,27 @@
-const axios = require('axios');
 const moment = require('moment-timezone');
 
-const { createPage, queryDatabase, getPageContent } = require('../interfaces/notionInterface');
+const {
+  createPage,
+  queryDatabase
+} = require('../../interfaces/notionInterface');
 const {
   localTime,
   onlyDate,
   yearMonthDayFormat,
   formatDayTitle,
-} = require('./momentHelpers');
+} = require('../momentHelpers');
 
-const { DAY_DATABASE_ID, WEEK_DATABASE_ID, SECTION_DATABASE_ID, DAY_TEMPLATE_ID } = process.env;
+const {
+  DAY_DATABASE_ID,
+  WEEK_DATABASE_ID,
+  SECTION_DATABASE_ID,
+} = process.env;
 
 values = {};
 
 values.createDaysForWeek = async (startDate, EndDate, weekId) => {
   const formattedEndDate = moment(EndDate);
   const currentDay = moment(startDate);
-  // const {data} = await getPageContent(DAY_TEMPLATE_ID)
   while (currentDay.isSameOrBefore(formattedEndDate)) {
     values.createNewDay(currentDay, weekId);
     currentDay.add(1, 'Day');
