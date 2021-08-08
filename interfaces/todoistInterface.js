@@ -43,6 +43,9 @@ exportedValues.createTask = async (body) =>
 exportedValues.closeTask = async (taskId) =>
   await todoistRestInterface.post(`/tasks/${taskId}/close`);
 
+exportedValues.deleteTask = async (taskId) =>
+  await todoistRestInterface.delete(`/tasks/${taskId}`);
+
 exportedValues.getAllLabels = async () =>
   await todoistRestInterface.get(`/labels`);
 

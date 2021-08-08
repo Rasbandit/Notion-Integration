@@ -39,7 +39,7 @@ const crons = {
     TIME_ZONE
   ),
   notionActionItems: new CronJob(
-    '*/10 * * * * *',
+    '0 */1 * * * *',
     getUpdatedNotionActionItems,
     null,
     false,

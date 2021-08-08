@@ -3,6 +3,7 @@ const {
   closeTask,
   getAllLabels,
   createTask,
+  deleteTask
 } = require('../../interfaces/todoistInterface');
 const { getPageContent } = require('../../interfaces/notionInterface');
 
@@ -16,7 +17,10 @@ actionItemUpdates.updatedItem = async (updatedItem) => {
   const todoistId = properties?.['Todoist Id']?.number || null;
 
   if (todoistId) {
-    if (properties.Done.checkbox) {
+    if(updatedItem.archived) {
+      deleteTask(todoistId)
+    }
+    else if (properties.Done.checkbox) {
       closeTask(todoistId);
     } else {
       const body = await createBody(updatedItem);
@@ -33,7 +37,7 @@ actionItemUpdates.updatedItem = async (updatedItem) => {
 
 const createBody = async (updatedItem) => {
   return {
-    content: updatedItem.properties.Name.title[0].plain_text,
+    content: updatedItem?.properties?.Name?.title?.[0]?.plain_text || "",
     label_ids: await getLabelIds(updatedItem.properties.Context.multi_select),
     priority: formatPriority(
       updatedItem?.properties?.Priority?.select?.name || '3rd Priority'
