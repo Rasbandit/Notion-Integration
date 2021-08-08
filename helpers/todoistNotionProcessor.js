@@ -51,7 +51,7 @@ const routeBook = async (book) => {
       const blockId = page?.data?.results?.[0]?.id;
       updateBook(matchingBook.id, blockId, book);
     }
-  } else if (!matchingBook) {
+  } else if (!matchingBook && !book.is_deleted) {
     createBook(book);
   }
 };
@@ -59,6 +59,7 @@ const routeBook = async (book) => {
 const routeActionItem = async (item) => {
   const matchingItem = await getActionItem(item);
   item = formatActionItemPriority(item);
+
   if (matchingItem) {
     const page = await getPageContent(matchingItem.id);
     const pageContent = page.data.results[0].paragraph.text[0].plain_text;
@@ -67,7 +68,7 @@ const routeActionItem = async (item) => {
       const blockId = page?.data?.results?.[0]?.id;
       updateActionItem(matchingItem.id, blockId, item);
     }
-  } else if (!matchingItem) {
+  } else if (!matchingItem && !item.is_deleted) {
     createNewActionItem(item);
   }
 };
