@@ -32,5 +32,3 @@ calendar.events.watch({calendarId: CALENDAR_ID, requestBody: body})
 //   },
 //   colorId: 1
 // }
-
-// calendar.events.insert({calendarId: CALENDAR_ID, resource: event}, console.log)

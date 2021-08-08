@@ -1,11 +1,18 @@
 const mfp = require('mfp');
 const storage = require('node-persist');
+const moment = require('moment');
 
 const { getSleepData } = require('../interfaces/ouraRingInterface');
-const { updatePage } = require('../interfaces/notionInterface');
-const { getDay, createNextWeek } = require('../helpers/notionHelpers/notionDayAndWeekHelpers');
+const { updatePage, queryDatabase } = require('../interfaces/notionInterface');
+const {
+  getDay,
+  createNextWeek,
+} = require('../helpers/notionHelpers/notionDayAndWeekHelpers');
 const { getUpdates } = require('../interfaces/todoistInterface');
 const { processUpdates } = require('../helpers/todoistNotionProcessor');
+const {
+  updatedItem,
+} = require('../helpers/notionHelpers/actionItemUpdated');
 
 const { localTime, yearMonthDayFormat } = require('../helpers/momentHelpers');
 
@@ -16,6 +23,7 @@ const init = async () => {
     await storage.init();
     await storage.setItem('sync_token', '*');
     await storage.setItem('isFirst', true);
+    await storage.setItem('actionItemsLastChecked', moment().seconds(0));
   }
 };
 
@@ -27,17 +35,19 @@ exportedValues.setSleepData = async () => {
     const { id: pageId } = await getDay(date);
     let sleepData = await getSleepData(date);
 
-    await updatePage(pageId, {
-      properties: {
-        'Sleep Start Hour': sleepData.sleepStartHour,
-        'Sleep Start Minute': sleepData.sleepStartMinute,
-        'Awake Hour': sleepData.sleepEndHour,
-        'Awake Minute': sleepData.sleepEndMinute,
-        'Total Sleep Hour': sleepData.totalSleepHour,
-        'Total Sleep Minute': sleepData.totalSleepMinuets,
-        'Sleep Score': sleepData.score,
-      },
-    });
+    if (sleepData) {
+      await updatePage(pageId, {
+        properties: {
+          'Sleep Start Hour': sleepData.sleepStartHour,
+          'Sleep Start Minute': sleepData.sleepStartMinute,
+          'Awake Hour': sleepData.sleepEndHour,
+          'Awake Minute': sleepData.sleepEndMinute,
+          'Total Sleep Hour': sleepData.totalSleepHour,
+          'Total Sleep Minute': sleepData.totalSleepMinuets,
+          'Sleep Score': sleepData.score,
+        },
+      });
+    }
   }
 };
 
@@ -73,6 +83,27 @@ exportedValues.getUpdatedTodoistItems = async () => {
   } else {
     await storage.setItem('isFirst', false);
   }
+};
+
+const { ACTION_ITEMS_DATABASE_ID } = process.env;
+
+exportedValues.getUpdatedNotionActionItems = async () => {
+  const lastChecked = moment(await storage.getItem('actionItemsLastChecked'));
+  let search = {
+    sorts: [{ property: 'Last Edited', direction: 'descending' }],
+    page_size: 100,
+  };
+  let response = await queryDatabase(ACTION_ITEMS_DATABASE_ID, search);
+  response.data.results.forEach((item) => {
+    if (
+      moment(item['last_edited_time']).isSameOrAfter(
+        lastChecked.subtract(1, 'minute')
+      )
+    ) {
+      updatedItem(item);
+    }
+  });
+  await storage.setItem('actionItemsLastChecked', moment().seconds(0));
 };
 
 exportedValues.createNextWeek = createNextWeek;

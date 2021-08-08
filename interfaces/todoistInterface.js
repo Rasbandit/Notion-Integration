@@ -34,4 +34,16 @@ exportedValues.getUpdates = async (sync_token) => {
 exportedValues.getLabel = async (labelId) =>
   await todoistRestInterface.get(`/labels/${labelId}`);
 
+exportedValues.updateTask = async (taskId, body) =>
+  await todoistRestInterface.post(`/tasks/${taskId}`, body);
+
+exportedValues.createTask = async (body) =>
+  await todoistRestInterface.post(`/tasks`, body);
+
+exportedValues.closeTask = async (taskId) =>
+  await todoistRestInterface.post(`/tasks/${taskId}/close`);
+
+exportedValues.getAllLabels = async () =>
+  await todoistRestInterface.get(`/labels`);
+
 module.exports = exportedValues;

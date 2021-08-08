@@ -4,20 +4,48 @@ const {
   updatePage,
   getPageContent,
   updateBlock,
+  appendBlock,
 } = require('../../interfaces/notionInterface');
 const { onlyDate } = require('../momentHelpers');
 
 const { ACTION_ITEMS_DATABASE_ID } = process.env;
 
-values = {};
+actionItemsValues = {};
 
-values.getActionItem = async (item) => {
+actionItemsValues.routeActionItem = async (item) => {
+  const matchingItem = await actionItemsValues.getActionItem(item);
+
+  if (matchingItem) {
+    const page = await getPageContent(matchingItem.id);
+    const pageContent =
+      page?.data?.results?.[0]?.paragraph?.text[0]?.plain_text || '';
+    matchingItem.pageContent = pageContent;
+    if (changesNeededActionItem(matchingItem, item)) {
+      const blockId = page?.data?.results?.[0]?.id || null;
+      actionItemsValues.updateActionItem(matchingItem.id, blockId, item);
+    }
+  } else if (!matchingItem && !item.is_deleted) {
+    actionItemsValues.createNewActionItem(item);
+  }
+};
+
+actionItemsValues.getActionItem = async (item) => {
   const options = {
     filter: {
-      property: 'Todoist Id',
-      number: {
-        equals: item.id,
-      },
+      or: [
+        {
+          property: 'Todoist Id',
+          number: {
+            equals: item.id,
+          },
+        },
+        {
+          property: 'Name',
+          text: {
+            equals: item.content,
+          },
+        },
+      ],
     },
     page_size: 1,
   };
@@ -25,14 +53,18 @@ values.getActionItem = async (item) => {
   return result.data.results[0];
 };
 
-values.createNewActionItem = async (item) => {
+actionItemsValues.createNewActionItem = async (item) => {
   const properties = makeActionItemBody(item);
   const children = [makeChild(item)];
   await createPage(ACTION_ITEMS_DATABASE_ID, properties, children);
 };
 
-values.updateActionItem = async (pageId, blockId, item) => {
-  await updateBlock(blockId, makeChild(item));
+actionItemsValues.updateActionItem = async (pageId, blockId, item) => {
+  if (blockId) {
+    await updateBlock(blockId, makeChild(item));
+  } else {
+    await appendBlock(pageId, { children: [makeChild(item)] });
+  }
 
   const updates = {
     archived: !!item.is_deleted,
@@ -87,4 +119,38 @@ const makeActionItemBody = (item) => {
   };
 };
 
-module.exports = values;
+const changesNeededActionItem = (existingItem, updatedItem) => {
+  const { properties } = existingItem;
+  let different = false;
+
+  if (properties?.Done?.checkbox !== !!updatedItem?.date_completed)
+    different = true;
+
+  if (properties?.["Todoist Id"]?.number !== updatedItem?.id)
+    different = true;
+
+  if (properties?.Priority?.select?.name !== updatedItem?.priority)
+    different = true;
+
+  if (properties?.Name?.title?.[0]?.plain_text !== updatedItem?.content)
+    different = true;
+
+  if (!areLabelsTheSame(properties?.Context?.multi_select, updatedItem?.labels))
+    different = true;
+
+  if (properties?.['Due Date']?.date?.start !== updatedItem?.due?.date)
+    different = true;
+
+  if (existingItem?.pageContent !== updatedItem?.description) different = true;
+
+  return different;
+};
+
+const areLabelsTheSame = (existingLabels, newLabels) => {
+  return (
+    existingLabels.length == newLabels.length &&
+    existingLabels.every(({ name }) => newLabels.includes(name))
+  );
+};
+
+module.exports = actionItemsValues;

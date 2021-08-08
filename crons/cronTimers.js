@@ -1,5 +1,11 @@
 const CronJob = require('cron').CronJob;
-const { setSleepData, createNextWeek, setEatingData, getUpdatedTodoistItems } = require('./cronTasks');
+const {
+  setSleepData,
+  createNextWeek,
+  setEatingData,
+  getUpdatedTodoistItems,
+  getUpdatedNotionActionItems,
+} = require('./cronTasks');
 
 const { TIME_ZONE } = process.env.TIME_ZONE;
 
@@ -26,12 +32,19 @@ const crons = {
     TIME_ZONE
   ),
   syncTodoist: new CronJob(
-    '*/5 * * * * *',
+    '*/3 * * * * *',
     getUpdatedTodoistItems,
     null,
     false,
     TIME_ZONE
-  )
+  ),
+  notionActionItems: new CronJob(
+    '*/10 * * * * *',
+    getUpdatedNotionActionItems,
+    null,
+    false,
+    TIME_ZONE
+  ),
 };
 
 const exportedValues = {};
