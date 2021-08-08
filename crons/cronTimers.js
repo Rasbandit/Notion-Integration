@@ -4,29 +4,29 @@ const { setSleepData, createNextWeek, setEatingData, getUpdatedTodoistItems } = 
 const { TIME_ZONE } = process.env.TIME_ZONE;
 
 const crons = {
-  // sleepDataCron: new CronJob(
-  //   '0 */5 * * * *',
-  //   setSleepData,
-  //   null,
-  //   false,
-  //   TIME_ZONE
-  // ),
-  // eatingDataCron: new CronJob(
-  //   '0 */5 * * * *',
-  //   setEatingData,
-  //   null,
-  //   false,
-  //   TIME_ZONE
-  // ),
-  // createNextWeekCron: new CronJob(
-  //   '0 0 1 * * 6',
-  //   createNextWeek,
-  //   null,
-  //   false,
-  //   TIME_ZONE
-  // ),
+  sleepDataCron: new CronJob(
+    '0 */5 * * * *',
+    setSleepData,
+    null,
+    false,
+    TIME_ZONE
+  ),
+  eatingDataCron: new CronJob(
+    '0 */5 * * * *',
+    setEatingData,
+    null,
+    false,
+    TIME_ZONE
+  ),
+  createNextWeekCron: new CronJob(
+    '0 0 1 * * 6',
+    createNextWeek,
+    null,
+    false,
+    TIME_ZONE
+  ),
   syncTodoist: new CronJob(
-    '*/3 * * * * *',
+    '*/5 * * * * *',
     getUpdatedTodoistItems,
     null,
     false,
