@@ -46,13 +46,13 @@ const findItemDatabase = async (item) => {
 
 const formatPriority = (item) => {
   if (item.priority === 1) {
-    item.priority = '3rd Priority';
+    item.priority = '3rd';
   } else if (item.priority === 2) {
-    item.priority = '2nd Priority';
+    item.priority = '2nd';
   } else if (item.priority === 3) {
-    item.priority = '1st Priority';
+    item.priority = '1st';
   } else if (item.priority === 4) {
-    item.priority = 'Emergency';
+    item.priority = '!!';
   }
   return item;
 };
