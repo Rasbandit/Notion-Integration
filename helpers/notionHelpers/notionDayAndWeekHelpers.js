@@ -17,7 +17,7 @@ const {
   SECTION_DATABASE_ID,
 } = process.env;
 
-values = {};
+const values = {};
 
 values.createDaysForWeek = async (startDate, EndDate, weekId) => {
   const formattedEndDate = moment(EndDate);
@@ -63,6 +63,7 @@ values.createNextWeek = async () => {
 
   const title = `${startDateTitle}-${endDateTitle}`;
 
+  console.log(values)
   let { id: sectionId } = await values.getLatestSection();
   const properties = {
     Dates: {

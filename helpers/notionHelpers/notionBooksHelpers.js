@@ -8,7 +8,7 @@ const {
 
 const { BOOKS_DATABASE_ID } = process.env;
 
-values = {};
+const values = {};
 
 values.routeBook = async (book) => {
   const matchingBook = await values.getBook(book);
