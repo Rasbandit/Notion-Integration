@@ -42,7 +42,7 @@ const createBody = async (updatedItem) => {
     priority: formatPriority(
       updatedItem?.properties?.Priority?.select?.name || '3rd Priority'
     ),
-    due_date: updatedItem.properties?.['Due Date']?.date?.start || '',
+    due_date: updatedItem.properties?.['Do Date']?.date?.start || '',
     description: await getDescription(updatedItem.id)
   };
 };
