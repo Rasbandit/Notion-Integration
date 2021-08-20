@@ -11,7 +11,7 @@ const { processUpdates } = require('./../todoistNotionProcessor');
 
 const actionItemUpdates = {};
 
-actionItemUpdates.updatedItem = async (updatedItem) => {
+actionItemUpdates.processUpdatedItem = async (updatedItem) => {
   const { properties } = updatedItem;
 
   const todoistId = properties?.['Todoist Id']?.number || null;
@@ -42,7 +42,7 @@ const createBody = async (updatedItem) => {
     priority: formatPriority(
       updatedItem?.properties?.Priority?.select?.name || '3rd Priority'
     ),
-    due_date: updatedItem.properties?.['Do Date']?.date?.start || '',
+    due_datetime: updatedItem.properties?.['Do Date']?.date?.start,
     description: await getDescription(updatedItem.id)
   };
 };

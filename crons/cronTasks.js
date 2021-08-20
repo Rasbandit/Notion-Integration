@@ -10,9 +10,7 @@ const {
 } = require('../helpers/notionHelpers/notionDayAndWeekHelpers');
 const { getUpdates } = require('../interfaces/todoistInterface');
 const { processUpdates } = require('../helpers/todoistNotionProcessor');
-const {
-  updatedItem,
-} = require('../helpers/notionHelpers/actionItemUpdated');
+const { processUpdatedItem } = require('../helpers/notionHelpers/actionItemUpdated');
 
 const { localTime, yearMonthDayFormat } = require('../helpers/momentHelpers');
 
@@ -88,19 +86,15 @@ exportedValues.getUpdatedTodoistItems = async () => {
 const { ACTION_ITEMS_DATABASE_ID } = process.env;
 
 exportedValues.getUpdatedNotionActionItems = async () => {
-  const lastChecked = moment(await storage.getItem('actionItemsLastChecked'));
   let search = {
     sorts: [{ property: 'Last Edited', direction: 'descending' }],
     page_size: 100,
   };
   let response = await queryDatabase(ACTION_ITEMS_DATABASE_ID, search);
+  const currentTime = moment().subtract(2, 'minutes').seconds(0);
   response.data.results.forEach((item) => {
-    if (
-      moment(item['last_edited_time']).isSameOrAfter(
-        lastChecked.subtract(1, 'minute')
-      )
-    ) {
-      updatedItem(item);
+    if (moment(item['last_edited_time']).isSame(currentTime, "minutes")) {
+      processUpdatedItem(item);
     }
   });
   await storage.setItem('actionItemsLastChecked', moment().seconds(0));
