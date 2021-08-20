@@ -95,7 +95,7 @@ const makeActionItemBody = (item) => {
         },
       ],
     },
-    'Due Date': {
+    'Do Date': {
       date: item?.due?.date
         ? {
             start: item.due.date,
