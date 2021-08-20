@@ -62,8 +62,9 @@ values.createNextWeek = async () => {
   const endDate = localTime().add(2, 'days').weekday(7);
   const startDateTitle = startDate.format('MMM D');
   const endDateTitle = endDate.format('MMM D');
+  const year = moment(startDate).format('YYYY')
 
-  const title = `${startDateTitle}-${endDateTitle}`;
+  const title = `${year} ${startDateTitle} - ${endDateTitle}`;
 
   let section = await values.getLatestSection();
   if (section.properties.Weeks.relation.length >= 4) {
