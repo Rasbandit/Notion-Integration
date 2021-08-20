@@ -2,7 +2,8 @@ const moment = require('moment-timezone');
 
 const {
   createPage,
-  queryDatabase
+  queryDatabase,
+  getPageContent,
 } = require('../../interfaces/notionInterface');
 const {
   localTime,
@@ -15,6 +16,7 @@ const {
   DAY_DATABASE_ID,
   WEEK_DATABASE_ID,
   SECTION_DATABASE_ID,
+  PERIOD_DATABASE_ID
 } = process.env;
 
 const values = {};
@@ -63,8 +65,12 @@ values.createNextWeek = async () => {
 
   const title = `${startDateTitle}-${endDateTitle}`;
 
-  console.log(values)
-  let { id: sectionId } = await values.getLatestSection();
+  let section = await values.getLatestSection();
+  if (section.properties.Weeks.relation.length >= 4) {
+    section = await values.createNewSection(startDate);
+  }
+
+  let { id: sectionId } = section;
   const properties = {
     Dates: {
       title: [
@@ -95,6 +101,76 @@ values.createNextWeek = async () => {
   values.createDaysForWeek(start, end, weekId);
 };
 
+values.createNewSection = async (startDate) => {
+  let period = await values.getLatestPeriod();
+  if (period.properties.Sections.relation.length >= 3) {
+    period = await values.createPeriod(startDate);
+  }
+  const endDate = moment(startDate).add(4, 'Weeks').weekday(0);
+  const startDateTitle = moment(startDate).format('MMM D');
+  const endDateTitle = moment(endDate).format('MMM D');
+  const year = moment(startDate).format('YYYY')
+
+  const title = `${year}, ${startDateTitle} - ${endDateTitle}`;
+  let { id: periodId } = period;
+
+  const properties = {
+    Name: {
+      title: [
+        {
+          text: {
+            content: title,
+          },
+        },
+      ],
+    },
+    Date: {
+      date: {
+        start: onlyDate(startDate),
+        end: onlyDate(endDate),
+      },
+    },
+    Period: {
+      relation: [
+        {
+          id: periodId,
+        },
+      ],
+    },
+  };
+  const results = await createPage(SECTION_DATABASE_ID, properties);
+  return results.data;
+};
+
+values.createPeriod = async (startDate) => {
+  const endDate = moment(startDate).add(12, 'Weeks').weekday(0);
+
+  const startDateTitle = moment(startDate).format('MMM');
+  const endDateTitle = moment(endDate).format('MMM');
+  const year = moment(startDate).format('YYYY')
+
+  const title = `${year}, ${startDateTitle} - ${endDateTitle}`;
+  const properties = {
+    Name: {
+      title: [
+        {
+          text: {
+            content: title,
+          },
+        },
+      ],
+    },
+    Date: {
+      date: {
+        start: onlyDate(startDate),
+        end: onlyDate(endDate),
+      },
+    },
+  };
+  const result = await createPage(PERIOD_DATABASE_ID, properties);
+  return result.data
+};
+
 values.getWeekOf = async (date) => {
   date = date.startOf('isoWeek');
   const options = {
@@ -108,6 +184,15 @@ values.getWeekOf = async (date) => {
     page_size: 1,
   };
   const result = await queryDatabase(WEEK_DATABASE_ID, options);
+  return result.data.results[0];
+};
+
+values.getLatestPeriod = async () => {
+  const options = {
+    sorts: [{ property: 'Date', direction: 'descending' }],
+    page_size: 1,
+  };
+  result = await queryDatabase(PERIOD_DATABASE_ID, options);
   return result.data.results[0];
 };
 
