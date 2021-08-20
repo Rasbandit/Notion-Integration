@@ -10,7 +10,7 @@ const { onlyDate } = require('../momentHelpers');
 
 const { ACTION_ITEMS_DATABASE_ID } = process.env;
 
-actionItemsValues = {};
+const actionItemsValues = {};
 
 actionItemsValues.routeActionItem = async (item) => {
   const matchingItem = await actionItemsValues.getActionItem(item);
@@ -98,7 +98,7 @@ const makeActionItemBody = (item) => {
     'Due Date': {
       date: item?.due?.date
         ? {
-            start: onlyDate(item.due.date),
+            start: item.due.date,
           }
         : null,
     },
