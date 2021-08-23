@@ -32,6 +32,12 @@ exportedValues.updatePage = async (pageId, options) =>
 exportedValues.getPage = async (pageId) =>
   await notionInstance.get(`/pages/${pageId}`);
 
+exportedValues.getBlock = async (blockId) =>
+  await notionInstance.get(`/blocks/${blockId}`);
+
+exportedValues.getBlockChildren = async (blockId) =>
+  await notionInstance.get(`/blocks/${blockId}/children`);
+
 exportedValues.getPageContent = async (pageId) => 
   await notionInstance.get(`/blocks/${pageId}/children`);
 

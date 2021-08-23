@@ -14,6 +14,8 @@ const { processUpdatedItem } = require('../helpers/notionHelpers/actionItemUpdat
 
 const { localTime, yearMonthDayFormat } = require('../helpers/momentHelpers');
 
+const { ACTION_ITEMS_DATABASE_ID } = process.env;
+
 const exportedValues = {};
 
 const init = async () => {
@@ -82,8 +84,6 @@ exportedValues.getUpdatedTodoistItems = async () => {
     await storage.setItem('isFirst', false);
   }
 };
-
-const { ACTION_ITEMS_DATABASE_ID } = process.env;
 
 exportedValues.getUpdatedNotionActionItems = async () => {
   let search = {

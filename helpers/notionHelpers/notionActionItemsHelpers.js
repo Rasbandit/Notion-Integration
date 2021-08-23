@@ -5,10 +5,12 @@ const {
   getPageContent,
   updateBlock,
   appendBlock,
+  getBlockChildren,
 } = require('../../interfaces/notionInterface');
-const { onlyDate } = require('../momentHelpers');
 
 const { ACTION_ITEMS_DATABASE_ID } = process.env;
+
+const TODOIST_DESCRIPTION = 'Todoist Description';
 
 const actionItemsValues = {};
 
@@ -16,16 +18,31 @@ actionItemsValues.routeActionItem = async (item) => {
   const matchingItem = await actionItemsValues.getActionItem(item);
 
   if (matchingItem) {
-    const page = await getPageContent(matchingItem.id);
-    const pageContent =
-      page?.data?.results?.[0]?.paragraph?.text[0]?.plain_text || '';
-    matchingItem.pageContent = pageContent;
+    const childBlockId = await actionItemsValues.getDescriptionBlock(
+      matchingItem.id
+    );
     if (changesNeededActionItem(matchingItem, item)) {
-      const blockId = page?.data?.results?.[0]?.id || null;
-      actionItemsValues.updateActionItem(matchingItem.id, blockId, item);
+      actionItemsValues.updateActionItem(matchingItem.id, childBlockId, item);
     }
   } else if (!matchingItem && !item.is_deleted) {
     actionItemsValues.createNewActionItem(item);
+  }
+};
+
+actionItemsValues.getDescriptionBlock = async (pageId) => {
+  const page = await getPageContent(pageId);
+  const descriptionToggleBlock = page?.data?.results.find((block) => {
+    if (block.type == 'toggle') {
+      const isTodoistDescription =
+        block.toggle.text[0].plain_text === TODOIST_DESCRIPTION;
+      if (isTodoistDescription) {
+        return true;
+      }
+    }
+  });
+  if (descriptionToggleBlock) {
+    const { data } = await getBlockChildren(descriptionToggleBlock.id);
+    return (childId = data.results[0].id);
   }
 };
 
@@ -55,15 +72,16 @@ actionItemsValues.getActionItem = async (item) => {
 
 actionItemsValues.createNewActionItem = async (item) => {
   const properties = makeActionItemBody(item);
-  const children = [makeChild(item)];
+  const children = [makeDescriptionToggle(item)];
   await createPage(ACTION_ITEMS_DATABASE_ID, properties, children);
 };
 
 actionItemsValues.updateActionItem = async (pageId, blockId, item) => {
   if (blockId) {
-    await updateBlock(blockId, makeChild(item));
+    await updateBlock(blockId, makeDescriptionText(item));
   } else {
-    await appendBlock(pageId, { children: [makeChild(item)] });
+    const x = makeDescriptionToggle(item)
+    await appendBlock(pageId, { children: [makeDescriptionToggle(item)] });
   }
 
   const updates = {
@@ -74,13 +92,31 @@ actionItemsValues.updateActionItem = async (pageId, blockId, item) => {
   await updatePage(pageId, updates);
 };
 
-const makeChild = (item) => {
+const makeDescriptionToggle = (item) => {
   return {
-    type: 'paragraph',
-    paragraph: {
-      text: [{ type: 'text', text: { content: item.description } }],
+    type: 'toggle',
+    toggle: {
+      text: [
+        {
+          type: 'text',
+          text: {
+            content: TODOIST_DESCRIPTION,
+            link: null,
+          },
+        },
+      ],
+      children: [makeDescriptionText(item)],
     },
   };
+};
+
+const makeDescriptionText = (item) => {
+  return {
+      type: 'paragraph',
+      paragraph: {
+        text: [{ type: 'text', text: { content: item.description } }],
+      },
+    }
 };
 
 const makeActionItemBody = (item) => {
@@ -95,7 +131,7 @@ const makeActionItemBody = (item) => {
         },
       ],
     },
-    'Do Date': {
+    'Due Date': {
       date: item?.due?.date
         ? {
             start: item.due.date,
@@ -126,8 +162,7 @@ const changesNeededActionItem = (existingItem, updatedItem) => {
   if (properties?.Done?.checkbox !== !!updatedItem?.date_completed)
     different = true;
 
-  if (properties?.["Todoist Id"]?.number !== updatedItem?.id)
-    different = true;
+  if (properties?.['Todoist Id']?.number !== updatedItem?.id) different = true;
 
   if (properties?.Priority?.select?.name !== updatedItem?.priority)
     different = true;
