@@ -7,6 +7,8 @@ const { updatePage, queryDatabase } = require('../interfaces/notionInterface');
 const {
   getDay,
   createNextWeek,
+  createNewDay,
+  getWeekOf
 } = require('../helpers/notionHelpers/notionDayAndWeekHelpers');
 const { getUpdates } = require('../interfaces/todoistInterface');
 const { processUpdates } = require('../helpers/todoistNotionProcessor');
@@ -72,6 +74,12 @@ exportedValues.setEatingData = async () => {
     );
   }
 };
+
+exportedValues.createNextDay = async () => {
+  const tomorrow = moment().add(1, "d")
+  const week = await getWeekOf(moment(tomorrow))
+  createNewDay(tomorrow, week.id)
+}
 
 exportedValues.getUpdatedTodoistItems = async () => {
   const sync_token = await storage.getItem('sync_token');

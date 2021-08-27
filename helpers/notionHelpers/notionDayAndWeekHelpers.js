@@ -96,10 +96,7 @@ values.createNextWeek = async () => {
       ],
     },
   };
-  const { data } = await createPage(WEEK_DATABASE_ID, properties);
-  const { start, end } = data.properties.Date.date;
-  const weekId = data.id;
-  values.createDaysForWeek(start, end, weekId);
+  await createPage(WEEK_DATABASE_ID, properties);
 };
 
 values.createNewSection = async (startDate) => {

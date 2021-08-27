@@ -5,6 +5,7 @@ const {
   setEatingData,
   getUpdatedTodoistItems,
   getUpdatedNotionActionItems,
+  createNextDay
 } = require('./cronTasks');
 
 const { TIME_ZONE } = process.env.TIME_ZONE;
@@ -27,6 +28,13 @@ const crons = {
   createNextWeekCron: new CronJob(
     '0 0 1 * * 6',
     createNextWeek,
+    null,
+    false,
+    TIME_ZONE
+  ),
+  createNewDayCron: new CronJob(
+    '0 20 * * *',
+    createNextDay,
     null,
     false,
     TIME_ZONE
