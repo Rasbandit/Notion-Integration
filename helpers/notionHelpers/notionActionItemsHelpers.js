@@ -18,7 +18,7 @@ actionItemsValues.routeActionItem = async (item) => {
   const matchingItem = await actionItemsValues.getActionItem(item);
 
   if (matchingItem) {
-    const childBlockId = await actionItemsValues.getDescriptionBlock(
+    const {id: childBlockId} = await actionItemsValues.getDescriptionBlock(
       matchingItem.id
     );
     if (changesNeededActionItem(matchingItem, item)) {
@@ -42,7 +42,7 @@ actionItemsValues.getDescriptionBlock = async (pageId) => {
   });
   if (descriptionToggleBlock) {
     const { data } = await getBlockChildren(descriptionToggleBlock.id);
-    return (childId = data.results[0].id);
+    return (childId = data.results[0]);
   }
 };
 
@@ -80,7 +80,6 @@ actionItemsValues.updateActionItem = async (pageId, blockId, item) => {
   if (blockId) {
     await updateBlock(blockId, makeDescriptionText(item));
   } else {
-    const x = makeDescriptionToggle(item)
     await appendBlock(pageId, { children: [makeDescriptionToggle(item)] });
   }
 

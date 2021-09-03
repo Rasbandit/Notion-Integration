@@ -8,15 +8,17 @@ const {
   getDay,
   createNextWeek,
   createNewDay,
-  getWeekOf
+  getWeekOf,
 } = require('../helpers/notionHelpers/notionDayAndWeekHelpers');
 const { getUpdates } = require('../interfaces/todoistInterface');
 const { processUpdates } = require('../helpers/todoistNotionProcessor');
-const { processUpdatedItem } = require('../helpers/notionHelpers/actionItemUpdated');
+const {
+  processUpdatedItem,
+} = require('../helpers/notionHelpers/actionItemUpdated');
 
 const { localTime, yearMonthDayFormat } = require('../helpers/momentHelpers');
 
-const { ACTION_ITEMS_DATABASE_ID } = process.env;
+const { ACTION_ITEMS_DATABASE_ID, GOAL_DATABASE_ID } = process.env;
 
 const exportedValues = {};
 
@@ -76,10 +78,10 @@ exportedValues.setEatingData = async () => {
 };
 
 exportedValues.createNextDay = async () => {
-  const tomorrow = moment().add(1, "d")
-  const week = await getWeekOf(moment(tomorrow))
-  createNewDay(tomorrow, week.id)
-}
+  const tomorrow = moment().add(1, 'd');
+  const week = await getWeekOf(moment(tomorrow));
+  createNewDay(tomorrow, week.id);
+};
 
 exportedValues.getUpdatedTodoistItems = async () => {
   const sync_token = await storage.getItem('sync_token');
@@ -101,11 +103,25 @@ exportedValues.getUpdatedNotionActionItems = async () => {
   let response = await queryDatabase(ACTION_ITEMS_DATABASE_ID, search);
   const currentTime = moment().subtract(2, 'minutes').seconds(0);
   response.data.results.forEach((item) => {
-    if (moment(item['last_edited_time']).isSame(currentTime, "minutes")) {
+    if (moment(item['last_edited_time']).isSame(currentTime, 'minutes')) {
       processUpdatedItem(item);
     }
   });
-  await storage.setItem('actionItemsLastChecked', moment().seconds(0));
+};
+
+exportedValues.getUpdatedNotionGoals = async () => {
+  let search = {
+    sorts: [{ property: 'Last Edited', direction: 'descending' }],
+    page_size: 10,
+  };
+  let response = await queryDatabase(GOAL_DATABASE_ID, search);
+  const currentTime = moment().subtract(2, 'minutes').seconds(0);;
+  response.data.results.forEach((item) => {
+    if (moment(item['last_edited_time']).isSame(currentTime, 'minutes')) {
+      console.log(item);
+      // processUpdatedItem(item);
+    }
+  });
 };
 
 exportedValues.createNextWeek = createNextWeek;

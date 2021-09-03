@@ -6,7 +6,7 @@ const {
 const { routeBook } = require('./notionHelpers/notionBooksHelpers');
 const { routeMedia } = require('./notionHelpers/notionMediaHelpers');
 
-const MEDIA_TYPES = ['Movie', 'Game', 'Podcast', 'Show']
+const MEDIA_TYPES = ['Movie', 'Game', 'Podcast', 'Show'];
 
 const exportedValues = {};
 
@@ -32,10 +32,9 @@ const routeOnLabel = async (item) => {
   if (item.is_deleted) findItemDatabase(item);
   else if (item.labels.includes('Book')) {
     routeBook(item);
-  } else if (item.labels.some(label => MEDIA_TYPES.includes(label))) {
-    routeMedia(item)
-  }
-  else {
+  } else if (item.labels.some((label) => MEDIA_TYPES.includes(label))) {
+    routeMedia(item);
+  } else {
     routeActionItem(item);
   }
 };

@@ -3,11 +3,15 @@ const {
   closeTask,
   getAllLabels,
   createTask,
-  deleteTask
+  deleteTask,
 } = require('../../interfaces/todoistInterface');
 const { getPageContent } = require('../../interfaces/notionInterface');
 
 const { processUpdates } = require('./../todoistNotionProcessor');
+
+const {
+  getDescriptionBlock,
+} = require('./../notionHelpers/notionActionItemsHelpers');
 
 const actionItemUpdates = {};
 
@@ -17,13 +21,15 @@ actionItemUpdates.processUpdatedItem = async (updatedItem) => {
   const todoistId = properties?.['Todoist Id']?.number || null;
 
   if (todoistId) {
-    if(updatedItem.archived) {
-      deleteTask(todoistId)
-    }
-    else if (properties.Done.checkbox) {
+    if (updatedItem.archived) {
+      deleteTask(todoistId);
+    } else if (properties.Done.checkbox) {
       closeTask(todoistId);
     } else {
+      const block = await getDescriptionBlock(updatedItem.id);
+      const description = block?.paragraph?.text?.[0]?.plain_text
       const body = await createBody(updatedItem);
+      if(description){body.description = description}
       await updateTask(todoistId, body);
     }
   } else {
@@ -37,13 +43,13 @@ actionItemUpdates.processUpdatedItem = async (updatedItem) => {
 
 const createBody = async (updatedItem) => {
   return {
-    content: updatedItem?.properties?.Name?.title?.[0]?.plain_text || "",
+    content: updatedItem?.properties?.Name?.title?.[0]?.plain_text || '',
     label_ids: await getLabelIds(updatedItem.properties.Context.multi_select),
     priority: formatPriority(
       updatedItem?.properties?.Priority?.select?.name || '3rd Priority'
     ),
     due_datetime: updatedItem.properties?.['Due Date']?.date?.start,
-    description: await getDescription(updatedItem.id)
+    description: await getDescription(updatedItem.id),
   };
 };
 
