@@ -3,8 +3,10 @@ const {
   queryDatabase,
   updatePage,
   getPageContent,
-  updateBlock
+  updateBlock,
 } = require('../../interfaces/notionInterface');
+
+const { closeTask } = require('../../interfaces/todoistInterface');
 
 const { BOOKS_DATABASE_ID } = process.env;
 
@@ -28,7 +30,8 @@ values.routeBook = async (book) => {
 values.createBook = async (book) => {
   const properties = makeBody(book);
   const children = [makeChild(book)];
-  await createPage(BOOKS_DATABASE_ID, properties, children);
+  createPage(BOOKS_DATABASE_ID, properties, children);
+  closeTask(book.id)
 };
 
 values.getBook = async (book) => {
@@ -50,8 +53,8 @@ values.updateBook = async (pageId, blockId, book) => {
 
   const updates = {
     archived: !!book.is_deleted,
-    properties: makeBody(book)
-  }
+    properties: makeBody(book),
+  };
   await updatePage(pageId, updates);
 };
 
