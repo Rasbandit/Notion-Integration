@@ -7,7 +7,7 @@ const {
 } = require('../../interfaces/todoistInterface');
 const { getPageContent } = require('../../interfaces/notionInterface');
 
-const { processUpdates } = require('./../todoistNotionProcessor');
+const { processUpdates } = require('../todoistHelpers.js/todoistNotionProcessor');
 
 const {
   getDescriptionBlock,

@@ -1,21 +1,17 @@
-const { getLabel } = require('../interfaces/todoistInterface');
+const { getLabel } = require('../../interfaces/todoistInterface');
 const {
   routeActionItem,
   getActionItem,
-} = require('./notionHelpers/notionActionItemsHelpers');
-const { routeBook } = require('./notionHelpers/notionBooksHelpers');
-const { routeMedia } = require('./notionHelpers/notionMediaHelpers');
+} = require('../notionHelpers/notionActionItemsHelpers');
+const { routeBook } = require('../notionHelpers/notionBooksHelpers');
+const { routeMedia } = require('../notionHelpers/notionMediaHelpers');
 
 const MEDIA_TYPES = ['Movie', 'Game', 'Podcast', 'Show'];
 
-const exportedValues = {};
-
-exportedValues.processUpdates = async (updates) => {
-  updates.items.forEach(async (item) => {
+const processTaskUpdates = async (item) => {
     item.labels = await convertLabelIdToLabelName(item);
     item = formatPriority(item);
     routeOnLabel(item);
-  });
 };
 
 const convertLabelIdToLabelName = async (item) => {
@@ -29,8 +25,7 @@ const convertLabelIdToLabelName = async (item) => {
 };
 
 const routeOnLabel = async (item) => {
-  if (item.is_deleted) findItemDatabase(item);
-  else if (item.labels.includes('Book')) {
+  if (item.labels.includes('Book')) {
     routeBook(item);
   } else if (item.labels.some((label) => MEDIA_TYPES.includes(label))) {
     routeMedia(item);
@@ -39,11 +34,6 @@ const routeOnLabel = async (item) => {
   }
 };
 
-const findItemDatabase = async (item) => {
-  if (await getActionItem(item)) {
-    return routeActionItem(item);
-  }
-};
 
 const formatPriority = (item) => {
   if (item.priority === 1) {
@@ -58,4 +48,4 @@ const formatPriority = (item) => {
   return item;
 };
 
-module.exports = exportedValues;
+module.exports = processTaskUpdates;

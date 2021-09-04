@@ -11,7 +11,7 @@ const {
   getWeekOf,
 } = require('../helpers/notionHelpers/notionDayAndWeekHelpers');
 const { getUpdates } = require('../interfaces/todoistInterface');
-const { processUpdates } = require('../helpers/todoistNotionProcessor');
+const { processUpdates } = require('../helpers/todoistHelpers.js/todoistNotionProcessor');
 const {
   processUpdatedItem,
 } = require('../helpers/notionHelpers/actionItemUpdated');
