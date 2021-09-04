@@ -15,6 +15,9 @@ const { processUpdates } = require('../helpers/todoistNotionProcessor');
 const {
   processUpdatedItem,
 } = require('../helpers/notionHelpers/actionItemUpdated');
+const {
+  setDefaultStatus,
+} = require('./../helpers/notionHelpers/notionActionItemsHelpers');
 
 const { localTime, yearMonthDayFormat } = require('../helpers/momentHelpers');
 
@@ -109,13 +112,27 @@ exportedValues.getUpdatedNotionActionItems = async () => {
   });
 };
 
+exportedValues.setTasksDefaultStatus = async () => {
+  let search = {
+    sorts: [{ property: 'Last Edited', direction: 'descending' }],
+    page_size: 15
+  };
+  let response = await queryDatabase(ACTION_ITEMS_DATABASE_ID, search);
+
+  response.data.results.forEach((item) => {
+    if (!item?.properties?.Status) {
+      setDefaultStatus(item.id);
+    }
+  });
+};
+
 exportedValues.getUpdatedNotionGoals = async () => {
   let search = {
     sorts: [{ property: 'Last Edited', direction: 'descending' }],
     page_size: 10,
   };
   let response = await queryDatabase(GOAL_DATABASE_ID, search);
-  const currentTime = moment().subtract(2, 'minutes').seconds(0);;
+  const currentTime = moment().subtract(2, 'minutes').seconds(0);
   response.data.results.forEach((item) => {
     if (moment(item['last_edited_time']).isSame(currentTime, 'minutes')) {
       console.log(item);

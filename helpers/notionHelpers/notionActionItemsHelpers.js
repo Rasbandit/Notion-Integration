@@ -18,7 +18,7 @@ actionItemsValues.routeActionItem = async (item) => {
   const matchingItem = await actionItemsValues.getActionItem(item);
 
   if (matchingItem) {
-    const {id: childBlockId} = await actionItemsValues.getDescriptionBlock(
+    const { id: childBlockId } = await actionItemsValues.getDescriptionBlock(
       matchingItem.id
     );
     if (changesNeededActionItem(matchingItem, item)) {
@@ -91,6 +91,20 @@ actionItemsValues.updateActionItem = async (pageId, blockId, item) => {
   await updatePage(pageId, updates);
 };
 
+actionItemsValues.setDefaultStatus = async (pageId) => {
+  const updates = {
+    properties: {
+      Status: {
+        select: {
+          name: "Actionable",
+        },
+      },
+    },
+  };
+
+  await updatePage(pageId, updates);
+};
+
 const makeDescriptionToggle = (item) => {
   return {
     type: 'toggle',
@@ -111,11 +125,11 @@ const makeDescriptionToggle = (item) => {
 
 const makeDescriptionText = (item) => {
   return {
-      type: 'paragraph',
-      paragraph: {
-        text: [{ type: 'text', text: { content: item.description } }],
-      },
-    }
+    type: 'paragraph',
+    paragraph: {
+      text: [{ type: 'text', text: { content: item.description } }],
+    },
+  };
 };
 
 const makeActionItemBody = (item) => {
