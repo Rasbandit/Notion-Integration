@@ -55,7 +55,7 @@ const crons = {
     false,
     TIME_ZONE
   ),
-  notionActionItems: new CronJob(
+  notionActionItemsDefaults: new CronJob(
     '*/5 * * * * *',
     setTasksDefaultStatus,
     null,
