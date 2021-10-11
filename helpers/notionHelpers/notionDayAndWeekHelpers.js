@@ -64,7 +64,7 @@ values.createNextWeek = async () => {
   const endDateTitle = endDate.format('MMM D');
   const year = moment(startDate).format('YYYY')
 
-  const title = `${year} ${startDateTitle} - ${endDateTitle}`;
+  const title = `${year} ${startDateTitle} -> ${endDateTitle}`;
 
   let section = await values.getLatestSection();
   if (section.properties.Weeks.relation.length >= 4) {
@@ -109,7 +109,7 @@ values.createNewSection = async (startDate) => {
   const endDateTitle = moment(endDate).format('MMM D');
   const year = moment(startDate).format('YYYY')
 
-  const title = `${year}, ${startDateTitle} - ${endDateTitle}`;
+  const title = `${year}, ${startDateTitle} -> ${endDateTitle}`;
   let { id: periodId } = period;
 
   const properties = {
@@ -147,7 +147,7 @@ values.createPeriod = async (startDate) => {
   const endDateTitle = moment(endDate).format('MMM');
   const year = moment(startDate).format('YYYY')
 
-  const title = `${year}, ${startDateTitle} - ${endDateTitle}`;
+  const title = `${year}, ${startDateTitle} -> ${endDateTitle}`;
   const properties = {
     Name: {
       title: [
