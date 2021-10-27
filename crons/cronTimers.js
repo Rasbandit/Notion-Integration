@@ -62,13 +62,13 @@ const crons = {
     false,
     TIME_ZONE
   ),
-  notionGoalsItems: new CronJob(
-    '*/5 * * * * *',
-    getUpdatedNotionGoals,
-    null,
-    false,
-    TIME_ZONE
-  ),
+  // notionGoalsItems: new CronJob(
+  //   '*/5 * * * * *',
+  //   getUpdatedNotionGoals,
+  //   null,
+  //   false,
+  //   TIME_ZONE
+  // ),
 };
 
 const exportedValues = {};
