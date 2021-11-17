@@ -2,7 +2,7 @@ const mfp = require('mfp');
 const storage = require('node-persist');
 const moment = require('moment');
 
-const { getSleepData } = require('../interfaces/ouraRingInterface');
+const { getSleepData, getActivityData } = require('../interfaces/ouraRingInterface');
 const { updatePage, queryDatabase } = require('../interfaces/notionInterface');
 const {
   getDay,
@@ -36,11 +36,12 @@ const init = async () => {
 
 init();
 
-exportedValues.setSleepData = async () => {
+exportedValues.ouraData = async () => {
   for (let i = 0; i < 7; i++) {
     let date = localTime().subtract(i, 'day');
     const { id: pageId } = await getDay(date);
     let sleepData = await getSleepData(date);
+    let activityData = await getActivityData(date);
 
     if (sleepData) {
       await updatePage(pageId, {
@@ -52,6 +53,7 @@ exportedValues.setSleepData = async () => {
           'Total Sleep Hour': sleepData.totalSleepHour,
           'Total Sleep Minute': sleepData.totalSleepMinuets,
           'Sleep Score': sleepData.score,
+          'Steps': activityData.steps
         },
       });
     }

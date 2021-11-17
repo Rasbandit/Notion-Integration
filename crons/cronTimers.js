@@ -1,6 +1,6 @@
 const CronJob = require('cron').CronJob;
 const {
-  setSleepData,
+  ouraData,
   createNextWeek,
   setEatingData,
   getUpdatedTodoistItems,
@@ -13,9 +13,9 @@ const {
 const { TIME_ZONE } = process.env.TIME_ZONE;
 
 const crons = {
-  sleepDataCron: new CronJob(
+  ouraData: new CronJob(
     '0 */5 * * * *',
-    setSleepData,
+    ouraData,
     null,
     false,
     TIME_ZONE

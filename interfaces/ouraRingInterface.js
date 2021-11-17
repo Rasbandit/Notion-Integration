@@ -48,6 +48,16 @@ values.getSleepData = async (date) => {
   }
 }
 
+values.getActivityData = async (date) => {
+  const previousDay = date.subtract(1, "days").format("YYYY-MM-DD")
+  const response = await ouraInstance.get(`/activity?start=${previousDay}`)
+  const activityData = response.data.activity[0]
+
+  if(!activityData) return;
+
+  return activityData
+}
+
 const getMinutes = (seconds) => {
   const [hours, minutes] = `${seconds/60/60}`.split(".")
   const percentMinutes = +minutes.substring(0,2)
