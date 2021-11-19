@@ -74,7 +74,7 @@ actionItemsValues.getActionItem = async (item) => {
 actionItemsValues.createNewActionItem = async (item) => {
   const properties = makeActionItemBody(item);
   const children = [makeDescriptionToggle(item)];
-  await createPage(ACTION_ITEMS_DATABASE_ID, properties, children);
+  await createPage(ACTION_ITEMS_DATABASE_ID, {properties, children});
 };
 
 actionItemsValues.updateActionItem = async (pageId, blockId, item) => {

@@ -53,7 +53,7 @@ const makeGoalProperties = (goal) => ({
 
 const createGoal = async (goal) => {
   const properties = makeGoalProperties(goal);
-  await createPage(GOAL_DATABASE_ID, properties);
+  await createPage(GOAL_DATABASE_ID, {properties});
 };
 
 const updateGoal = async (pageId, goal) => {

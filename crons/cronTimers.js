@@ -67,22 +67,15 @@ const crons = {
 const exportedValues = {};
 
 exportedValues.startAllCrons = () => {
-  crons.keys().forEach((key) => {
-    crons[key].startCron();
+  Object.keys(crons).forEach((key) => {
+    crons[key].start();
   });
 };
 
 exportedValues.stopAllCrons = () => {
-  crons.keys().forEach((key) => {
-    crons[key].stopCron();
+  Object.keys(crons).forEach((key) => {
+    crons[key].stop();
   });
-};
-
-exportedValues.startCron = (cronName) => {
-  crons[cronName].start();
-};
-exportedValues.stopCron = (cronName) => {
-  crons[cronName].stop();
 };
 
 module.exports = exportedValues;

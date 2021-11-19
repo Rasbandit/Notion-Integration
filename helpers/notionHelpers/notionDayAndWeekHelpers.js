@@ -1,4 +1,5 @@
 const moment = require('moment-timezone');
+const emoji = require('random-happy-emoji');
 
 const {createPage, queryDatabase} = require('../../interfaces/notionInterface');
 const {
@@ -17,40 +18,44 @@ const {
 
 const values = {};
 
-values.createDaysForWeek = async (startDate, EndDate, weekId) => {
-  const formattedEndDate = moment(EndDate);
-  const currentDay = moment(startDate);
-  while (currentDay.isSameOrBefore(formattedEndDate)) {
-    values.createNewDay(currentDay, weekId);
-    currentDay.add(1, 'Day');
-  }
-};
-
 values.createNewDay = async (date, weekId, children = []) => {
-  const properties = {
-    Title: {
-      title: [
-        {
-          text: {
-            content: formatDayTitle(date),
-          },
-        },
-      ],
+  const pageObj = {
+    icon: {
+      type: 'emoji',
+      emoji: emoji(),
     },
-    Date: {
-      date: {
-        start: onlyDate(date),
+    cover: {
+      type: 'external',
+      external: {
+        url: 'https://source.unsplash.com/random/1500x500',
       },
     },
-    Week: {
-      relation: [
-        {
-          id: weekId,
+    properties: {
+      Title: {
+        title: [
+          {
+            text: {
+              content: formatDayTitle(date),
+            },
+          },
+        ],
+      },
+      Date: {
+        date: {
+          start: onlyDate(date),
         },
-      ],
+      },
+      Week: {
+        relation: [
+          {
+            id: weekId,
+          },
+        ],
+      },
     },
+    children,
   };
-  await createPage(DAY_DATABASE_ID, properties, children);
+  await createPage(DAY_DATABASE_ID, pageObj);
 };
 
 values.createNextWeek = async () => {
@@ -92,7 +97,7 @@ values.createNextWeek = async () => {
       ],
     },
   };
-  await createPage(WEEK_DATABASE_ID, properties);
+  await createPage(WEEK_DATABASE_ID, {properties});
 };
 
 values.createNewSection = async (startDate) => {
@@ -132,7 +137,7 @@ values.createNewSection = async (startDate) => {
       ],
     },
   };
-  const results = await createPage(SECTION_DATABASE_ID, properties);
+  const results = await createPage(SECTION_DATABASE_ID, {properties});
   return results.data;
 };
 
@@ -161,7 +166,7 @@ values.createPeriod = async (startDate) => {
       },
     },
   };
-  const result = await createPage(PERIOD_DATABASE_ID, properties);
+  const result = await createPage(PERIOD_DATABASE_ID, {properties});
   return result.data;
 };
 

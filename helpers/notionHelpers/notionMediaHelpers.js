@@ -35,7 +35,7 @@ const createMedia = async (media) => {
   if (media.date_completed) return;
   const properties = makeBody(media);
   const children = [makeChild(media)];
-  createPage(MEDIA_DATABASE_ID, properties, children);
+  createPage(MEDIA_DATABASE_ID, {properties, children});
   closeTask(media.id);
 };
 

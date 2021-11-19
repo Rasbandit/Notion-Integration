@@ -21,7 +21,9 @@
     "mfp": "^0.7.0",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33",
-    "node-persist": "^3.1.0"
+    "node-persist": "^3.1.0",
+    "random-happy-emoji": "^2.0.4",
+    "random-image-unsplash": "^1.0.6"
   },
   "devDependencies": {
     "eslint": "^8.2.0",

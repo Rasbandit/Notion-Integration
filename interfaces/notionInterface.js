@@ -12,14 +12,14 @@ const notionInstance = axios.create({
 
 const exportedValues = {};
 
-exportedValues.createPage = async (database_id, properties, children = []) => {
+exportedValues.createPage = async (database_id, values) => {
   const body = {
+    ...values,
     parent: {
       database_id,
     },
-    properties,
-    children,
   };
+  console.log(body);
   return await notionInstance.post('/pages', body);
 };
 

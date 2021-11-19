@@ -14,7 +14,7 @@ const createBook = async (book) => {
   if (book.date_completed) return;
   const properties = makeBody(book);
   const children = [makeChild(book)];
-  createPage(BOOKS_DATABASE_ID, properties, children);
+  createPage(BOOKS_DATABASE_ID, {properties, children});
   closeTask(book.id);
 };
 
