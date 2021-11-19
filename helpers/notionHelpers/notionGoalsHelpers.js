@@ -1,10 +1,10 @@
 const {
   createPage,
   queryDatabase,
-  updatePage
+  updatePage,
 } = require('../../interfaces/notionInterface');
 
-const { GOAL_DATABASE_ID } = process.env;
+const {GOAL_DATABASE_ID} = process.env;
 
 const upsertGoal = async (goal) => {
   const matchingGoal = await getGoal(goal);
@@ -56,31 +56,29 @@ const updateGoal = async (pageId, goal) => {
   await updatePage(pageId, updates);
 };
 
-const makeGoalProperties = (goal) => {
-  return {
-    Name: {
-      title: [
-        {
-          type: 'text',
-          text: {
-            content: goal.name,
-          },
+const makeGoalProperties = (goal) => ({
+  Name: {
+    title: [
+      {
+        type: 'text',
+        text: {
+          content: goal.name,
         },
-      ],
-    },
-    Status: {
-      select: {
-        name: determineStatus(goal),
       },
+    ],
+  },
+  Status: {
+    select: {
+      name: determineStatus(goal),
     },
-    'Todoist Id': {
-      number: goal.id,
-    },
-  };
-};
+  },
+  'Todoist Id': {
+    number: goal.id,
+  },
+});
 
 const changesNeededGoal = (existingItem, updatedItem) => {
-  const { properties } = existingItem;
+  const {properties} = existingItem;
   let different = false;
 
   if (properties?.Name?.title?.[0]?.plain_text !== updatedItem?.name)
@@ -93,8 +91,8 @@ const changesNeededGoal = (existingItem, updatedItem) => {
 };
 
 const determineStatus = (goal) => {
-  if(goal.is_archived) return "Completed";
-  return goal.is_favorite ? "Active" : "Inactive"
-}
+  if (goal.is_archived) return 'Completed';
+  return goal.is_favorite ? 'Active' : 'Inactive';
+};
 
 module.exports = upsertGoal;

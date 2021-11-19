@@ -1,23 +1,23 @@
-const { getLabel } = require('../../interfaces/todoistInterface');
+const {getLabel} = require('../../interfaces/todoistInterface');
 const {
   routeActionItem,
   getActionItem,
 } = require('../notionHelpers/notionActionItemsHelpers');
-const { routeBook } = require('../notionHelpers/notionBooksHelpers');
-const { routeMedia } = require('../notionHelpers/notionMediaHelpers');
+const {routeBook} = require('../notionHelpers/notionBooksHelpers');
+const {routeMedia} = require('../notionHelpers/notionMediaHelpers');
 
 const MEDIA_TYPES = ['Movie', 'Game', 'Podcast', 'Show'];
 
 const processTaskUpdates = async (item) => {
-    item.labels = await convertLabelIdToLabelName(item);
-    item = formatPriority(item);
-    routeOnLabel(item);
+  item.labels = await convertLabelIdToLabelName(item);
+  item = formatPriority(item);
+  routeOnLabel(item);
 };
 
 const convertLabelIdToLabelName = async (item) => {
   if (!item.labels.length) return [];
   const labelPromises = item.labels.map(async (labelId) => {
-    const { data } = await getLabel(labelId);
+    const {data} = await getLabel(labelId);
     return data.name.split('_').join(' ');
   });
   const labels = await Promise.all(labelPromises);
@@ -33,7 +33,6 @@ const routeOnLabel = async (item) => {
     routeActionItem(item);
   }
 };
-
 
 const formatPriority = (item) => {
   if (item.priority === 1) {

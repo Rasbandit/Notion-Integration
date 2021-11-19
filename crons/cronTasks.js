@@ -2,26 +2,31 @@ const mfp = require('mfp');
 const storage = require('node-persist');
 const moment = require('moment');
 
-const { getSleepData, getActivityData } = require('../interfaces/ouraRingInterface');
-const { updatePage, queryDatabase } = require('../interfaces/notionInterface');
+const {
+  getSleepData,
+  getActivityData,
+} = require('../interfaces/ouraRingInterface');
+const {updatePage, queryDatabase} = require('../interfaces/notionInterface');
 const {
   getDay,
   createNextWeek,
   createNewDay,
   getWeekOf,
 } = require('../helpers/notionHelpers/notionDayAndWeekHelpers');
-const { getUpdates } = require('../interfaces/todoistInterface');
-const { processUpdates } = require('../helpers/todoistHelpers.js/todoistNotionProcessor');
+const {getUpdates} = require('../interfaces/todoistInterface');
+const {
+  processUpdates,
+} = require('../helpers/todoistHelpers.js/todoistNotionProcessor');
 const {
   processUpdatedItem,
 } = require('../helpers/notionHelpers/actionItemUpdated');
 const {
   setDefaultStatus,
-} = require('./../helpers/notionHelpers/notionActionItemsHelpers');
+} = require('../helpers/notionHelpers/notionActionItemsHelpers');
 
-const { localTime, yearMonthDayFormat } = require('../helpers/momentHelpers');
+const {localTime, yearMonthDayFormat} = require('../helpers/momentHelpers');
 
-const { ACTION_ITEMS_DATABASE_ID, GOAL_DATABASE_ID } = process.env;
+const {ACTION_ITEMS_DATABASE_ID, GOAL_DATABASE_ID} = process.env;
 
 const exportedValues = {};
 
@@ -38,10 +43,10 @@ init();
 
 exportedValues.ouraData = async () => {
   for (let i = 0; i < 7; i++) {
-    let date = localTime().subtract(i, 'day');
-    const { id: pageId } = await getDay(date);
-    let sleepData = await getSleepData(date);
-    let activityData = await getActivityData(date);
+    const date = localTime().subtract(i, 'day');
+    const {id: pageId} = await getDay(date);
+    const sleepData = await getSleepData(date);
+    const activityData = await getActivityData(date);
 
     if (sleepData) {
       await updatePage(pageId, {
@@ -53,7 +58,7 @@ exportedValues.ouraData = async () => {
           'Total Sleep Hour': sleepData.totalSleepHour,
           'Total Sleep Minute': sleepData.totalSleepMinuets,
           'Sleep Score': sleepData.score,
-          'Steps': activityData.steps
+          Steps: activityData.steps,
         },
       });
     }
@@ -62,13 +67,13 @@ exportedValues.ouraData = async () => {
 
 exportedValues.setEatingData = async () => {
   for (let i = 0; i < 7; i++) {
-    let date = localTime().subtract(i, 'day');
-    let { id: pageId } = await getDay(date);
+    const date = localTime().subtract(i, 'day');
+    const {id: pageId} = await getDay(date);
     mfp.fetchSingleDate(
       'rasbandit',
       yearMonthDayFormat(date),
       'all',
-      function (response) {
+      (response) => {
         updatePage(pageId, {
           properties: {
             Calories: response.calories,
@@ -77,7 +82,7 @@ exportedValues.setEatingData = async () => {
             Fat: response.fat,
           },
         });
-      }
+      },
     );
   }
 };
@@ -91,7 +96,7 @@ exportedValues.createNextDay = async () => {
 exportedValues.getUpdatedTodoistItems = async () => {
   const sync_token = await storage.getItem('sync_token');
   const isFirst = await storage.getItem('isFirst');
-  let data = await getUpdates(sync_token);
+  const data = await getUpdates(sync_token);
   storage.updateItem('sync_token', data.sync_token);
   if (!isFirst) {
     processUpdates(data);
@@ -101,25 +106,25 @@ exportedValues.getUpdatedTodoistItems = async () => {
 };
 
 exportedValues.getUpdatedNotionActionItems = async () => {
-  let search = {
-    sorts: [{ property: 'Last Edited', direction: 'descending' }],
+  const search = {
+    sorts: [{property: 'Last Edited', direction: 'descending'}],
     page_size: 100,
   };
-  let response = await queryDatabase(ACTION_ITEMS_DATABASE_ID, search);
+  const response = await queryDatabase(ACTION_ITEMS_DATABASE_ID, search);
   const currentTime = moment().subtract(2, 'minutes').seconds(0);
   response.data.results.forEach((item) => {
-    if (moment(item['last_edited_time']).isSame(currentTime, 'minutes')) {
+    if (moment(item.last_edited_time).isSame(currentTime, 'minutes')) {
       processUpdatedItem(item);
     }
   });
 };
 
 exportedValues.setTasksDefaultStatus = async () => {
-  let search = {
-    sorts: [{ property: 'Last Edited', direction: 'descending' }],
-    page_size: 15
+  const search = {
+    sorts: [{property: 'Last Edited', direction: 'descending'}],
+    page_size: 15,
   };
-  let response = await queryDatabase(ACTION_ITEMS_DATABASE_ID, search);
+  const response = await queryDatabase(ACTION_ITEMS_DATABASE_ID, search);
 
   response.data.results.forEach((item) => {
     if (!item?.properties?.Status) {
@@ -129,14 +134,14 @@ exportedValues.setTasksDefaultStatus = async () => {
 };
 
 exportedValues.getUpdatedNotionGoals = async () => {
-  let search = {
-    sorts: [{ property: 'Last Edited', direction: 'descending' }],
+  const search = {
+    sorts: [{property: 'Last Edited', direction: 'descending'}],
     page_size: 10,
   };
-  let response = await queryDatabase(GOAL_DATABASE_ID, search);
+  const response = await queryDatabase(GOAL_DATABASE_ID, search);
   const currentTime = moment().subtract(2, 'minutes').seconds(0);
   response.data.results.forEach((item) => {
-    if (moment(item['last_edited_time']).isSame(currentTime, 'minutes')) {
+    if (moment(item.last_edited_time).isSame(currentTime, 'minutes')) {
       console.log(item);
       // processUpdatedItem(item);
     }

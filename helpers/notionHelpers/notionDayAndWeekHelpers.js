@@ -16,7 +16,7 @@ const {
   DAY_DATABASE_ID,
   WEEK_DATABASE_ID,
   SECTION_DATABASE_ID,
-  PERIOD_DATABASE_ID
+  PERIOD_DATABASE_ID,
 } = process.env;
 
 const values = {};
@@ -62,7 +62,7 @@ values.createNextWeek = async () => {
   const endDate = localTime().add(2, 'days').weekday(7);
   const startDateTitle = startDate.format('MMM D');
   const endDateTitle = endDate.format('MMM D');
-  const year = moment(startDate).format('YYYY')
+  const year = moment(startDate).format('YYYY');
 
   const title = `${year} ${startDateTitle} -> ${endDateTitle}`;
 
@@ -71,7 +71,7 @@ values.createNextWeek = async () => {
     section = await values.createNewSection(startDate);
   }
 
-  let { id: sectionId } = section;
+  const {id: sectionId} = section;
   const properties = {
     Dates: {
       title: [
@@ -107,10 +107,10 @@ values.createNewSection = async (startDate) => {
   const endDate = moment(startDate).add(4, 'Weeks').weekday(0);
   const startDateTitle = moment(startDate).format('MMM D');
   const endDateTitle = moment(endDate).format('MMM D');
-  const year = moment(startDate).format('YYYY')
+  const year = moment(startDate).format('YYYY');
 
   const title = `${year}, ${startDateTitle} -> ${endDateTitle}`;
-  let { id: periodId } = period;
+  const {id: periodId} = period;
 
   const properties = {
     Name: {
@@ -145,7 +145,7 @@ values.createPeriod = async (startDate) => {
 
   const startDateTitle = moment(startDate).format('MMM');
   const endDateTitle = moment(endDate).format('MMM');
-  const year = moment(startDate).format('YYYY')
+  const year = moment(startDate).format('YYYY');
 
   const title = `${year}, ${startDateTitle} -> ${endDateTitle}`;
   const properties = {
@@ -166,7 +166,7 @@ values.createPeriod = async (startDate) => {
     },
   };
   const result = await createPage(PERIOD_DATABASE_ID, properties);
-  return result.data
+  return result.data;
 };
 
 values.getWeekOf = async (date) => {
@@ -178,7 +178,7 @@ values.getWeekOf = async (date) => {
         equals: onlyDate(date.weekday(1)),
       },
     },
-    sorts: [{ property: 'Date', direction: 'descending' }],
+    sorts: [{property: 'Date', direction: 'descending'}],
     page_size: 1,
   };
   const result = await queryDatabase(WEEK_DATABASE_ID, options);
@@ -187,7 +187,7 @@ values.getWeekOf = async (date) => {
 
 values.getLatestPeriod = async () => {
   const options = {
-    sorts: [{ property: 'Date', direction: 'descending' }],
+    sorts: [{property: 'Date', direction: 'descending'}],
     page_size: 1,
   };
   result = await queryDatabase(PERIOD_DATABASE_ID, options);
@@ -196,7 +196,7 @@ values.getLatestPeriod = async () => {
 
 values.getLatestSection = async () => {
   const options = {
-    sorts: [{ property: 'Date', direction: 'descending' }],
+    sorts: [{property: 'Date', direction: 'descending'}],
     page_size: 1,
   };
   result = await queryDatabase(SECTION_DATABASE_ID, options);
@@ -211,7 +211,7 @@ values.getDay = async (date) => {
         equals: yearMonthDayFormat(date),
       },
     },
-    sorts: [{ property: 'Date', direction: 'descending' }],
+    sorts: [{property: 'Date', direction: 'descending'}],
     page_size: 1,
   };
   result = await queryDatabase(DAY_DATABASE_ID, options);

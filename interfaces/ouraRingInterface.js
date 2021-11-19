@@ -1,5 +1,3 @@
-
-
 const axios = require('axios');
 const moment = require('moment-timezone');
 
@@ -12,29 +10,28 @@ const ouraInstance = axios.create({
   },
 });
 
-const values = {}
+const values = {};
 
 values.getSleepData = async (date) => {
-  const previousDay = date.subtract(1, "days").format("YYYY-MM-DD")
-  const response = await ouraInstance.get(`/sleep?start=${previousDay}`)
-  const sleepData = response.data.sleep[0]
+  const previousDay = date.subtract(1, 'days').format('YYYY-MM-DD');
+  const response = await ouraInstance.get(`/sleep?start=${previousDay}`);
+  const sleepData = response.data.sleep[0];
 
-  if(!sleepData) return;
+  if (!sleepData) return;
 
-  const startTime = moment(sleepData.bedtime_start).tz(process.env.TIME_ZONE)
-  const endTime = moment(sleepData.bedtime_end).tz(process.env.TIME_ZONE)
+  const startTime = moment(sleepData.bedtime_start).tz(process.env.TIME_ZONE);
+  const endTime = moment(sleepData.bedtime_end).tz(process.env.TIME_ZONE);
 
-  let sleepStartHour = +startTime.format("HH")
-  const sleepStartMinute = +startTime.format("m")
-  const sleepEndHour = +endTime.format("HH")
-  const sleepEndMinute = +endTime.format("m")
+  let sleepStartHour = +startTime.format('HH');
+  const sleepStartMinute = +startTime.format('m');
+  const sleepEndHour = +endTime.format('HH');
+  const sleepEndMinute = +endTime.format('m');
 
-  const totalSleepHour = Math.floor(sleepData.total/60/60)
-  const totalSleepMinuets = getMinutes(sleepData.total)
+  const totalSleepHour = Math.floor(sleepData.total / 60 / 60);
+  const totalSleepMinuets = getMinutes(sleepData.total);
 
-
-  if(sleepStartHour < 12) {
-    sleepStartHour += 24
+  if (sleepStartHour < 12) {
+    sleepStartHour += 24;
   }
 
   return {
@@ -44,24 +41,24 @@ values.getSleepData = async (date) => {
     sleepEndMinute,
     score: sleepData.score,
     totalSleepMinuets,
-    totalSleepHour
-  }
-}
+    totalSleepHour,
+  };
+};
 
 values.getActivityData = async (date) => {
-  const previousDay = date.subtract(1, "days").format("YYYY-MM-DD")
-  const response = await ouraInstance.get(`/activity?start=${previousDay}`)
-  const activityData = response.data.activity[0]
+  const previousDay = date.subtract(1, 'days').format('YYYY-MM-DD');
+  const response = await ouraInstance.get(`/activity?start=${previousDay}`);
+  const activityData = response.data.activity[0];
 
-  if(!activityData) return;
+  if (!activityData) return;
 
-  return activityData
-}
+  return activityData;
+};
 
 const getMinutes = (seconds) => {
-  const [hours, minutes] = `${seconds/60/60}`.split(".")
-  const percentMinutes = +minutes.substring(0,2)
-  return Math.round((percentMinutes/100)*60)
-}
+  const [hours, minutes] = `${seconds / 60 / 60}`.split('.');
+  const percentMinutes = +minutes.substring(0, 2);
+  return Math.round((percentMinutes / 100) * 60);
+};
 
-module.exports = values
+module.exports = values;

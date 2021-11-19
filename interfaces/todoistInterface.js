@@ -24,7 +24,7 @@ const exportedValues = {};
 const resource_types = `["items", "projects", "sections", "reminders"]`;
 
 exportedValues.getUpdates = async (sync_token) => {
-  const { data } = await todoistSyncInterface.post('', {
+  const {data} = await todoistSyncInterface.post('', {
     sync_token,
     resource_types,
   });

@@ -8,7 +8,7 @@ const {
   getBlockChildren,
 } = require('../../interfaces/notionInterface');
 
-const { ACTION_ITEMS_DATABASE_ID } = process.env;
+const {ACTION_ITEMS_DATABASE_ID} = process.env;
 
 const TODOIST_DESCRIPTION = 'Todoist Description';
 
@@ -18,8 +18,8 @@ actionItemsValues.routeActionItem = async (item) => {
   const matchingItem = await actionItemsValues.getActionItem(item);
 
   if (matchingItem) {
-    const { id: childBlockId } = await actionItemsValues.getDescriptionBlock(
-      matchingItem.id
+    const {id: childBlockId} = await actionItemsValues.getDescriptionBlock(
+      matchingItem.id,
     );
     if (changesNeededActionItem(matchingItem, item)) {
       actionItemsValues.updateActionItem(matchingItem.id, childBlockId, item);
@@ -41,7 +41,7 @@ actionItemsValues.getDescriptionBlock = async (pageId) => {
     }
   });
   if (descriptionToggleBlock) {
-    const { data } = await getBlockChildren(descriptionToggleBlock.id);
+    const {data} = await getBlockChildren(descriptionToggleBlock.id);
     return (childId = data.results[0]);
   }
 };
@@ -80,7 +80,7 @@ actionItemsValues.updateActionItem = async (pageId, blockId, item) => {
   if (blockId) {
     await updateBlock(blockId, makeDescriptionText(item));
   } else {
-    await appendBlock(pageId, { children: [makeDescriptionToggle(item)] });
+    await appendBlock(pageId, {children: [makeDescriptionToggle(item)]});
   }
 
   const updates = {
@@ -96,7 +96,7 @@ actionItemsValues.setDefaultStatus = async (pageId) => {
     properties: {
       Status: {
         select: {
-          name: "Actionable",
+          name: 'Actionable',
         },
       },
     },
@@ -105,71 +105,65 @@ actionItemsValues.setDefaultStatus = async (pageId) => {
   await updatePage(pageId, updates);
 };
 
-const makeDescriptionToggle = (item) => {
-  return {
-    type: 'toggle',
-    toggle: {
-      text: [
-        {
-          type: 'text',
-          text: {
-            content: TODOIST_DESCRIPTION,
-            link: null,
-          },
+const makeDescriptionToggle = (item) => ({
+  type: 'toggle',
+  toggle: {
+    text: [
+      {
+        type: 'text',
+        text: {
+          content: TODOIST_DESCRIPTION,
+          link: null,
         },
-      ],
-      children: [makeDescriptionText(item)],
-    },
-  };
-};
-
-const makeDescriptionText = (item) => {
-  return {
-    type: 'paragraph',
-    paragraph: {
-      text: [{ type: 'text', text: { content: item.description } }],
-    },
-  };
-};
-
-const makeActionItemBody = (item) => {
-  return {
-    Name: {
-      title: [
-        {
-          type: 'text',
-          text: {
-            content: item.content,
-          },
-        },
-      ],
-    },
-    'Due Date': {
-      date: item?.due?.date
-        ? {
-            start: item.due.date,
-          }
-        : null,
-    },
-    Context: {
-      multi_select: item.labels.map((label) => ({ name: label })),
-    },
-    Priority: {
-      select: {
-        name: item.priority,
       },
+    ],
+    children: [makeDescriptionText(item)],
+  },
+});
+
+const makeDescriptionText = (item) => ({
+  type: 'paragraph',
+  paragraph: {
+    text: [{type: 'text', text: {content: item.description}}],
+  },
+});
+
+const makeActionItemBody = (item) => ({
+  Name: {
+    title: [
+      {
+        type: 'text',
+        text: {
+          content: item.content,
+        },
+      },
+    ],
+  },
+  'Due Date': {
+    date: item?.due?.date
+      ? {
+          start: item.due.date,
+        }
+      : null,
+  },
+  Context: {
+    multi_select: item.labels.map((label) => ({name: label})),
+  },
+  Priority: {
+    select: {
+      name: item.priority,
     },
-    Done: {
-      checkbox: !!item.date_completed,
-    },
-    'Todoist Id': {
-      number: item.id,
-    },
-  };
-};
+  },
+  Done: {
+    checkbox: !!item.date_completed,
+  },
+  'Todoist Id': {
+    number: item.id,
+  },
+});
 
 const changesNeededActionItem = (existingItem, updatedItem) => {
-  const { properties } = existingItem;
+  const {properties} = existingItem;
   let different = false;
 
   if (properties?.Done?.checkbox !== !!updatedItem?.date_completed)
@@ -194,11 +188,8 @@ const changesNeededActionItem = (existingItem, updatedItem) => {
   return different;
 };
 
-const areLabelsTheSame = (existingLabels, newLabels) => {
-  return (
-    existingLabels.length == newLabels.length &&
-    existingLabels.every(({ name }) => newLabels.includes(name))
-  );
-};
+const areLabelsTheSame = (existingLabels, newLabels) =>
+  existingLabels.length == newLabels.length &&
+  existingLabels.every(({name}) => newLabels.includes(name));
 
 module.exports = actionItemsValues;

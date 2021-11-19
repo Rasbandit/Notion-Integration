@@ -1,4 +1,4 @@
-const CronJob = require('cron').CronJob;
+const {CronJob} = require('cron');
 const {
   ouraData,
   createNextWeek,
@@ -7,60 +7,54 @@ const {
   getUpdatedNotionActionItems,
   createNextDay,
   getUpdatedNotionGoals,
-  setTasksDefaultStatus
+  setTasksDefaultStatus,
 } = require('./cronTasks');
 
-const { TIME_ZONE } = process.env.TIME_ZONE;
+const {TIME_ZONE} = process.env.TIME_ZONE;
 
 const crons = {
-  ouraData: new CronJob(
-    '0 */5 * * * *',
-    ouraData,
-    null,
-    false,
-    TIME_ZONE
-  ),
+  ouraData: new CronJob('0 */5 * * * *', ouraData, null, false, TIME_ZONE),
   eatingDataCron: new CronJob(
     '0 */5 * * * *',
     setEatingData,
     null,
     false,
-    TIME_ZONE
+    TIME_ZONE,
   ),
   createNextWeekCron: new CronJob(
     '0 0 1 * * 6',
     createNextWeek,
     null,
     false,
-    TIME_ZONE
+    TIME_ZONE,
   ),
   createNewDayCron: new CronJob(
     '0 20 * * *',
     createNextDay,
     null,
     false,
-    TIME_ZONE
+    TIME_ZONE,
   ),
   syncTodoist: new CronJob(
     '*/3 * * * * *',
     getUpdatedTodoistItems,
     null,
     false,
-    TIME_ZONE
+    TIME_ZONE,
   ),
   notionActionItems: new CronJob(
     '0 */1 * * * *',
     getUpdatedNotionActionItems,
     null,
     false,
-    TIME_ZONE
+    TIME_ZONE,
   ),
   notionActionItemsDefaults: new CronJob(
     '*/5 * * * * *',
     setTasksDefaultStatus,
     null,
     false,
-    TIME_ZONE
+    TIME_ZONE,
   ),
   // notionGoalsItems: new CronJob(
   //   '*/5 * * * * *',
