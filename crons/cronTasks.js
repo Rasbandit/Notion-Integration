@@ -42,49 +42,57 @@ const init = async () => {
 init();
 
 exportedValues.ouraData = async () => {
-  for (let i = 0; i < 7; i++) {
-    const date = localTime().subtract(i, 'day');
-    const {id: pageId} = await getDay(date);
-    const sleepData = await getSleepData(date);
-    const activityData = await getActivityData(date);
+  for (let i = 0; i < 7; i += 1) {
+    getAndProcessOuraData(i);
+  }
+};
 
-    if (sleepData) {
-      await updatePage(pageId, {
-        properties: {
-          'Sleep Start Hour': sleepData.sleepStartHour,
-          'Sleep Start Minute': sleepData.sleepStartMinute,
-          'Awake Hour': sleepData.sleepEndHour,
-          'Awake Minute': sleepData.sleepEndMinute,
-          'Total Sleep Hour': sleepData.totalSleepHour,
-          'Total Sleep Minute': sleepData.totalSleepMinuets,
-          'Sleep Score': sleepData.score,
-          Steps: activityData.steps,
-        },
-      });
-    }
+const getAndProcessOuraData = async (offset) => {
+  const date = localTime().subtract(offset, 'day');
+  const {id: pageId} = await getDay(date);
+  const sleepData = await getSleepData(date);
+  const activityData = await getActivityData(date);
+
+  if (sleepData) {
+    await updatePage(pageId, {
+      properties: {
+        'Sleep Start Hour': sleepData.sleepStartHour,
+        'Sleep Start Minute': sleepData.sleepStartMinute,
+        'Awake Hour': sleepData.sleepEndHour,
+        'Awake Minute': sleepData.sleepEndMinute,
+        'Total Sleep Hour': sleepData.totalSleepHour,
+        'Total Sleep Minute': sleepData.totalSleepMinuets,
+        'Sleep Score': sleepData.score,
+        Steps: activityData.steps,
+      },
+    });
   }
 };
 
 exportedValues.setEatingData = async () => {
-  for (let i = 0; i < 7; i++) {
-    const date = localTime().subtract(i, 'day');
-    const {id: pageId} = await getDay(date);
-    mfp.fetchSingleDate(
-      'rasbandit',
-      yearMonthDayFormat(date),
-      'all',
-      (response) => {
-        updatePage(pageId, {
-          properties: {
-            Calories: response.calories,
-            Protein: response.protein,
-            Carbs: response.carbs,
-            Fat: response.fat,
-          },
-        });
-      },
-    );
+  for (let i = 0; i < 7; i += 1) {
+    getAndSetEatingData(i);
   }
+};
+
+const getAndSetEatingData = async (offset) => {
+  const date = localTime().subtract(offset, 'day');
+  const {id: pageId} = await getDay(date);
+  mfp.fetchSingleDate(
+    'rasbandit',
+    yearMonthDayFormat(date),
+    'all',
+    (response) => {
+      updatePage(pageId, {
+        properties: {
+          Calories: response.calories,
+          Protein: response.protein,
+          Carbs: response.carbs,
+          Fat: response.fat,
+        },
+      });
+    },
+  );
 };
 
 exportedValues.createNextDay = async () => {

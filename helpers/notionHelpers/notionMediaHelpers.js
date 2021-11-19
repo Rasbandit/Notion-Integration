@@ -6,25 +6,6 @@ const {MEDIA_DATABASE_ID} = process.env;
 
 const values = {};
 
-values.routeMedia = async (media) => {
-  createMedia(media);
-};
-
-createMedia = async (media) => {
-  if (media.date_completed) return;
-  const properties = makeBody(media);
-  const children = [makeChild(media)];
-  createPage(MEDIA_DATABASE_ID, properties, children);
-  closeTask(media.id);
-};
-
-const makeChild = (media) => ({
-  type: 'paragraph',
-  paragraph: {
-    text: [{type: 'text', text: {content: media.description}}],
-  },
-});
-
 const makeBody = (media) => ({
   Name: {
     title: [
@@ -42,5 +23,24 @@ const makeBody = (media) => ({
     },
   },
 });
+
+const makeChild = (media) => ({
+  type: 'paragraph',
+  paragraph: {
+    text: [{type: 'text', text: {content: media.description}}],
+  },
+});
+
+const createMedia = async (media) => {
+  if (media.date_completed) return;
+  const properties = makeBody(media);
+  const children = [makeChild(media)];
+  createPage(MEDIA_DATABASE_ID, properties, children);
+  closeTask(media.id);
+};
+
+values.routeMedia = async (media) => {
+  createMedia(media);
+};
 
 module.exports = values;

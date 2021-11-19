@@ -32,17 +32,18 @@ actionItemsValues.routeActionItem = async (item) => {
 actionItemsValues.getDescriptionBlock = async (pageId) => {
   const page = await getPageContent(pageId);
   const descriptionToggleBlock = page?.data?.results.find((block) => {
-    if (block.type == 'toggle') {
+    if (block.type === 'toggle') {
       const isTodoistDescription =
         block.toggle.text[0].plain_text === TODOIST_DESCRIPTION;
       if (isTodoistDescription) {
         return true;
       }
     }
+    return false;
   });
   if (descriptionToggleBlock) {
     const {data} = await getBlockChildren(descriptionToggleBlock.id);
-    return (childId = data.results[0]);
+    return data.results[0];
   }
 };
 
@@ -66,7 +67,7 @@ actionItemsValues.getActionItem = async (item) => {
     },
     page_size: 1,
   };
-  result = await queryDatabase(ACTION_ITEMS_DATABASE_ID, options);
+  const result = await queryDatabase(ACTION_ITEMS_DATABASE_ID, options);
   return result.data.results[0];
 };
 
@@ -189,7 +190,7 @@ const changesNeededActionItem = (existingItem, updatedItem) => {
 };
 
 const areLabelsTheSame = (existingLabels, newLabels) =>
-  existingLabels.length == newLabels.length &&
+  existingLabels.length === newLabels.length &&
   existingLabels.every(({name}) => newLabels.includes(name));
 
 module.exports = actionItemsValues;

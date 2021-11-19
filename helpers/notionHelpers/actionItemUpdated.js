@@ -78,10 +78,10 @@ const formatPriority = (priority) => {
     return 2;
   }
   if (priority === '1st Priority') {
-    return (priority = 3);
+    return 3;
   }
   if (priority === 'Emergency') {
-    return (priority = 4);
+    return 4;
   }
   return 1;
 };

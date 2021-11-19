@@ -1,17 +1,22 @@
 const {getLabel} = require('../../interfaces/todoistInterface');
-const {
-  routeActionItem,
-  getActionItem,
-} = require('../notionHelpers/notionActionItemsHelpers');
+const {routeActionItem} = require('../notionHelpers/notionActionItemsHelpers');
 const {routeBook} = require('../notionHelpers/notionBooksHelpers');
 const {routeMedia} = require('../notionHelpers/notionMediaHelpers');
 
 const MEDIA_TYPES = ['Movie', 'Game', 'Podcast', 'Show'];
 
-const processTaskUpdates = async (item) => {
-  item.labels = await convertLabelIdToLabelName(item);
-  item = formatPriority(item);
-  routeOnLabel(item);
+const formatPriority = (item) => {
+  const copyItem = {...item};
+  if (item.priority === 1) {
+    copyItem.priority = '3rd';
+  } else if (item.priority === 2) {
+    copyItem.priority = '2nd';
+  } else if (item.priority === 3) {
+    copyItem.priority = '1st';
+  } else if (item.priority === 4) {
+    copyItem.priority = '!!';
+  }
+  return copyItem;
 };
 
 const convertLabelIdToLabelName = async (item) => {
@@ -34,17 +39,11 @@ const routeOnLabel = async (item) => {
   }
 };
 
-const formatPriority = (item) => {
-  if (item.priority === 1) {
-    item.priority = '3rd';
-  } else if (item.priority === 2) {
-    item.priority = '2nd';
-  } else if (item.priority === 3) {
-    item.priority = '1st';
-  } else if (item.priority === 4) {
-    item.priority = '!!';
-  }
-  return item;
+const processTaskUpdates = async (item) => {
+  let copyItem = {...item};
+  copyItem.labels = await convertLabelIdToLabelName(item);
+  copyItem = formatPriority(item);
+  routeOnLabel(copyItem);
 };
 
 module.exports = processTaskUpdates;

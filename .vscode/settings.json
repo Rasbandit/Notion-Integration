@@ -1,5 +1,6 @@
 {
   "files.autoSave": "onFocusChange",
   "editor.defaultFormatter": "dbaeumer.vscode-eslint",
-  "editor.formatOnPaste": true
+  "eslint.alwaysShowStatus": true,
+  "editor.formatOnSave": true
 }

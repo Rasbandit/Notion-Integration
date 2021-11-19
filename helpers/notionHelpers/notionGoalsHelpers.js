@@ -6,18 +6,6 @@ const {
 
 const {GOAL_DATABASE_ID} = process.env;
 
-const upsertGoal = async (goal) => {
-  const matchingGoal = await getGoal(goal);
-
-  if (matchingGoal) {
-    if (changesNeededGoal(matchingGoal, goal)) {
-      updateGoal(matchingGoal.id, goal);
-    }
-  } else if (!matchingGoal && !goal.is_deleted) {
-    createGoal(goal);
-  }
-};
-
 const getGoal = async (goal) => {
   const options = {
     filter: {
@@ -38,22 +26,8 @@ const getGoal = async (goal) => {
     },
     page_size: 1,
   };
-  result = await queryDatabase(GOAL_DATABASE_ID, options);
+  const result = await queryDatabase(GOAL_DATABASE_ID, options);
   return result.data.results[0];
-};
-
-const createGoal = async (goal) => {
-  const properties = makeGoalProperties(goal);
-  await createPage(GOAL_DATABASE_ID, properties);
-};
-
-const updateGoal = async (pageId, goal) => {
-  const updates = {
-    archived: !!goal.is_deleted,
-    properties: makeGoalProperties(goal),
-  };
-
-  await updatePage(pageId, updates);
 };
 
 const makeGoalProperties = (goal) => ({
@@ -77,6 +51,20 @@ const makeGoalProperties = (goal) => ({
   },
 });
 
+const createGoal = async (goal) => {
+  const properties = makeGoalProperties(goal);
+  await createPage(GOAL_DATABASE_ID, properties);
+};
+
+const updateGoal = async (pageId, goal) => {
+  const updates = {
+    archived: !!goal.is_deleted,
+    properties: makeGoalProperties(goal),
+  };
+
+  await updatePage(pageId, updates);
+};
+
 const changesNeededGoal = (existingItem, updatedItem) => {
   const {properties} = existingItem;
   let different = false;
@@ -93,6 +81,18 @@ const changesNeededGoal = (existingItem, updatedItem) => {
 const determineStatus = (goal) => {
   if (goal.is_archived) return 'Completed';
   return goal.is_favorite ? 'Active' : 'Inactive';
+};
+
+const upsertGoal = async (goal) => {
+  const matchingGoal = await getGoal(goal);
+
+  if (matchingGoal) {
+    if (changesNeededGoal(matchingGoal, goal)) {
+      updateGoal(matchingGoal.id, goal);
+    }
+  } else if (!matchingGoal && !goal.is_deleted) {
+    createGoal(goal);
+  }
 };
 
 module.exports = upsertGoal;

@@ -24,27 +24,27 @@ exportedValues.createPage = async (database_id, properties, children = []) => {
 };
 
 exportedValues.queryDatabase = async (databaseId, options) =>
-  await notionInstance.post(`/databases/${databaseId}/query`, options);
+  notionInstance.post(`/databases/${databaseId}/query`, options);
 
 exportedValues.updatePage = async (pageId, options) =>
-  await notionInstance.patch(`/pages/${pageId}`, options);
+  notionInstance.patch(`/pages/${pageId}`, options);
 
 exportedValues.getPage = async (pageId) =>
-  await notionInstance.get(`/pages/${pageId}`);
+  notionInstance.get(`/pages/${pageId}`);
 
 exportedValues.getBlock = async (blockId) =>
-  await notionInstance.get(`/blocks/${blockId}`);
+  notionInstance.get(`/blocks/${blockId}`);
 
 exportedValues.getBlockChildren = async (blockId) =>
-  await notionInstance.get(`/blocks/${blockId}/children`);
+  notionInstance.get(`/blocks/${blockId}/children`);
 
 exportedValues.getPageContent = async (pageId) =>
-  await notionInstance.get(`/blocks/${pageId}/children`);
+  notionInstance.get(`/blocks/${pageId}/children`);
 
 exportedValues.updateBlock = async (blockId, updates) =>
-  await notionInstance.patch(`/blocks/${blockId}`, updates);
+  notionInstance.patch(`/blocks/${blockId}`, updates);
 
 exportedValues.appendBlock = async (pageId, body) =>
-  await notionInstance.patch(`/blocks/${pageId}/children`, body);
+  notionInstance.patch(`/blocks/${pageId}/children`, body);
 
 module.exports = exportedValues;

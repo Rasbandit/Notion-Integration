@@ -1,5 +1,4 @@
 const axios = require('axios');
-const storage = require('node-persist');
 
 const todoistSyncInterface = axios.create({
   baseURL: 'https://api.todoist.com/sync/v8/sync',
@@ -31,22 +30,21 @@ exportedValues.getUpdates = async (sync_token) => {
   return data;
 };
 
-exportedValues.getLabel = async (labelId) =>
-  await todoistRestInterface.get(`/labels/${labelId}`);
+exportedValues.getLabel = (labelId) =>
+  todoistRestInterface.get(`/labels/${labelId}`);
 
 exportedValues.updateTask = async (taskId, body) =>
-  await todoistRestInterface.post(`/tasks/${taskId}`, body);
+  todoistRestInterface.post(`/tasks/${taskId}`, body);
 
 exportedValues.createTask = async (body) =>
-  await todoistRestInterface.post(`/tasks`, body);
+  todoistRestInterface.post(`/tasks`, body);
 
 exportedValues.closeTask = async (taskId) =>
-  await todoistRestInterface.post(`/tasks/${taskId}/close`);
+  todoistRestInterface.post(`/tasks/${taskId}/close`);
 
 exportedValues.deleteTask = async (taskId) =>
-  await todoistRestInterface.delete(`/tasks/${taskId}`);
+  todoistRestInterface.delete(`/tasks/${taskId}`);
 
-exportedValues.getAllLabels = async () =>
-  await todoistRestInterface.get(`/labels`);
+exportedValues.getAllLabels = async () => todoistRestInterface.get(`/labels`);
 
 module.exports = exportedValues;

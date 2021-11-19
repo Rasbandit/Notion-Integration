@@ -12,6 +12,10 @@
   "rules": {
     "prettier/prettier": "error",
     "no-unused-vars": "warn",
-    "no-console": "warn"
+    "no-console": "off",
+    "camelcase": "off",
+    "consistent-return": "off",
+    "no-return-await": "off",
+    "no-use-before-define": "off"
   }
 }

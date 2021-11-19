@@ -10,7 +10,7 @@ values.routeBook = async (book) => {
   createBook(book);
 };
 
-createBook = async (book) => {
+const createBook = async (book) => {
   if (book.date_completed) return;
   const properties = makeBody(book);
   const children = [makeChild(book)];

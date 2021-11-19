@@ -1,10 +1,6 @@
 const moment = require('moment-timezone');
 
-const {
-  createPage,
-  queryDatabase,
-  getPageContent,
-} = require('../../interfaces/notionInterface');
+const {createPage, queryDatabase} = require('../../interfaces/notionInterface');
 const {
   localTime,
   onlyDate,
@@ -170,12 +166,12 @@ values.createPeriod = async (startDate) => {
 };
 
 values.getWeekOf = async (date) => {
-  date = date.startOf('isoWeek');
+  const startOfWeek = date.startOf('isoWeek');
   const options = {
     filter: {
       property: 'Date',
       date: {
-        equals: onlyDate(date.weekday(1)),
+        equals: onlyDate(startOfWeek.weekday(1)),
       },
     },
     sorts: [{property: 'Date', direction: 'descending'}],
@@ -190,7 +186,7 @@ values.getLatestPeriod = async () => {
     sorts: [{property: 'Date', direction: 'descending'}],
     page_size: 1,
   };
-  result = await queryDatabase(PERIOD_DATABASE_ID, options);
+  const result = await queryDatabase(PERIOD_DATABASE_ID, options);
   return result.data.results[0];
 };
 
@@ -199,7 +195,7 @@ values.getLatestSection = async () => {
     sorts: [{property: 'Date', direction: 'descending'}],
     page_size: 1,
   };
-  result = await queryDatabase(SECTION_DATABASE_ID, options);
+  const result = await queryDatabase(SECTION_DATABASE_ID, options);
   return result.data.results[0];
 };
 
@@ -214,7 +210,7 @@ values.getDay = async (date) => {
     sorts: [{property: 'Date', direction: 'descending'}],
     page_size: 1,
   };
-  result = await queryDatabase(DAY_DATABASE_ID, options);
+  const result = await queryDatabase(DAY_DATABASE_ID, options);
   return result.data.results[0];
 };
 

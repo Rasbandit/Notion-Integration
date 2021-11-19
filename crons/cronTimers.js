@@ -6,7 +6,6 @@ const {
   getUpdatedTodoistItems,
   getUpdatedNotionActionItems,
   createNextDay,
-  getUpdatedNotionGoals,
   setTasksDefaultStatus,
 } = require('./cronTasks');
 
@@ -68,15 +67,15 @@ const crons = {
 const exportedValues = {};
 
 exportedValues.startAllCrons = () => {
-  for (const cron in crons) {
-    exportedValues.startCron(cron);
-  }
+  crons.keys().forEach((key) => {
+    crons[key].startCron();
+  });
 };
 
 exportedValues.stopAllCrons = () => {
-  for (const cron in crons) {
-    exportedValues.stopCron(cron);
-  }
+  crons.keys().forEach((key) => {
+    crons[key].stopCron();
+  });
 };
 
 exportedValues.startCron = (cronName) => {

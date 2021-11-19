@@ -12,6 +12,12 @@ const ouraInstance = axios.create({
 
 const values = {};
 
+const getMinutes = (seconds) => {
+  const minutes = `${seconds / 60 / 60}`.split('.')[1];
+  const percentMinutes = +minutes.substring(0, 2);
+  return Math.round((percentMinutes / 100) * 60);
+};
+
 values.getSleepData = async (date) => {
   const previousDay = date.subtract(1, 'days').format('YYYY-MM-DD');
   const response = await ouraInstance.get(`/sleep?start=${previousDay}`);
@@ -53,12 +59,6 @@ values.getActivityData = async (date) => {
   if (!activityData) return;
 
   return activityData;
-};
-
-const getMinutes = (seconds) => {
-  const [hours, minutes] = `${seconds / 60 / 60}`.split('.');
-  const percentMinutes = +minutes.substring(0, 2);
-  return Math.round((percentMinutes / 100) * 60);
 };
 
 module.exports = values;

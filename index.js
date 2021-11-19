@@ -8,8 +8,6 @@ const {taskerWebhook} = require('./endpoints/notionEndpoints');
 const app = express();
 const {PORT} = process.env;
 
-const x = 'y';
-
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
