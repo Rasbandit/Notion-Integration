@@ -9,7 +9,7 @@ storage.init();
 
 const exportedValues = {};
 
-exportedValues.taskerWebhook = async (req, res) => {
+exportedValues.taskerEndOfDay = async (req, res) => {
   const {date, secondsInCar} = req.body;
   const formattedDate = moment(date, 'MM-DD-YY');
 

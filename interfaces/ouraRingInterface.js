@@ -25,10 +25,8 @@ values.getSleepData = async (date) => {
 
   if (!sleepData) return;
 
-  const timeZoneOffset = Math.floor((sleepData.timezone / 60) * 10) / 10;
-
-  const startTime = moment(sleepData.bedtime_start).add(timeZoneOffset);
-  const endTime = moment(sleepData.bedtime_end).add(timeZoneOffset);
+  const startTime = moment(sleepData.bedtime_start);
+  const endTime = moment(sleepData.bedtime_end);
 
   let sleepStartHour = +startTime.format('HH');
   const sleepStartMinute = +startTime.format('m');
