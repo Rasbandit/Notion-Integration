@@ -31,8 +31,8 @@ const {ACTION_ITEMS_DATABASE_ID, GOAL_DATABASE_ID} = process.env;
 const exportedValues = {};
 
 const init = async () => {
-  if (!storage.getItem) {
-    await storage.init();
+  await storage.init();
+  if ((await storage.getItem('isFirst')) !== true) {
     await storage.setItem('sync_token', '*');
     await storage.setItem('isFirst', true);
     await storage.setItem('actionItemsLastChecked', moment().seconds(0));
@@ -96,7 +96,7 @@ const getAndSetEatingData = async (offset) => {
 };
 
 exportedValues.createNextDay = async () => {
-  const tomorrow = moment().add(1, 'd');
+  const tomorrow = localTime().add(1, 'd');
   const week = await getWeekOf(moment(tomorrow));
   createNewDay(tomorrow, week.id);
 };

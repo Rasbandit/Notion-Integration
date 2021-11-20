@@ -1,6 +1,11 @@
 const moment = require('moment');
+const storage = require('node-persist');
 const {getDay} = require('../helpers/notionHelpers/notionDayAndWeekHelpers');
 const {updatePage} = require('../interfaces/notionInterface');
+const {startAllCrons, stopAllCrons} = require('../crons/cronTimers');
+const {updateOffset} = require('../helpers/momentHelpers');
+
+storage.init();
 
 const exportedValues = {};
 
@@ -18,6 +23,20 @@ exportedValues.taskerWebhook = async (req, res) => {
   });
 
   res.sendStatus(200);
+};
+
+exportedValues.taskerTimezone = async (req, res) => {
+  const {offset: newOffset} = req.body;
+
+  const currentOffset = await storage.get('timeZoneOffset');
+  if (+currentOffset !== newOffset) {
+    await storage.setItem('timeZoneOffset', `${newOffset}`);
+    await updateOffset();
+    stopAllCrons();
+    await startAllCrons();
+  }
+
+  res.send(200);
 };
 
 module.exports = exportedValues;

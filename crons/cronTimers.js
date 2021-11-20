@@ -1,4 +1,5 @@
 const {CronJob} = require('cron');
+const storage = require('node-persist');
 const {
   ouraData,
   createNextWeek,
@@ -9,52 +10,84 @@ const {
   setTasksDefaultStatus,
 } = require('./cronTasks');
 
-const {TIME_ZONE} = process.env.TIME_ZONE;
-
 const crons = {
-  ouraData: new CronJob('0 */5 * * * *', ouraData, null, false, TIME_ZONE),
-  eatingDataCron: new CronJob(
-    '0 */5 * * * *',
-    setEatingData,
-    null,
-    false,
-    TIME_ZONE,
-  ),
-  createNextWeekCron: new CronJob(
-    '0 0 1 * * 6',
-    createNextWeek,
-    null,
-    false,
-    TIME_ZONE,
-  ),
-  createNewDayCron: new CronJob(
-    '0 20 * * *',
-    createNextDay,
-    null,
-    false,
-    TIME_ZONE,
-  ),
-  syncTodoist: new CronJob(
-    '*/3 * * * * *',
-    getUpdatedTodoistItems,
-    null,
-    false,
-    TIME_ZONE,
-  ),
-  notionActionItems: new CronJob(
-    '0 */1 * * * *',
-    getUpdatedNotionActionItems,
-    null,
-    false,
-    TIME_ZONE,
-  ),
-  notionActionItemsDefaults: new CronJob(
-    '*/5 * * * * *',
-    setTasksDefaultStatus,
-    null,
-    false,
-    TIME_ZONE,
-  ),
+  ouraData: (offset) =>
+    new CronJob(
+      '0 */5 * * * *',
+      ouraData,
+      null,
+      false,
+      null,
+      null,
+      false,
+      offset,
+    ),
+  eatingDataCron: (offset) =>
+    new CronJob(
+      '0 */5 * * * *',
+      setEatingData,
+      null,
+      false,
+      null,
+      null,
+      false,
+      offset,
+    ),
+  createNextWeekCron: (offset) =>
+    new CronJob(
+      '0 0 1 * * 6',
+      createNextWeek,
+      null,
+      false,
+      null,
+      null,
+      false,
+      offset,
+    ),
+  createNewDayCron: (offset) =>
+    new CronJob(
+      '0 20 * * *',
+      createNextDay,
+      null,
+      false,
+      null,
+      null,
+      false,
+      offset,
+    ),
+  syncTodoist: (offset) =>
+    new CronJob(
+      '*/3 * * * * *',
+      getUpdatedTodoistItems,
+      null,
+      false,
+      null,
+      null,
+      false,
+      offset,
+    ),
+  notionActionItems: (offset) =>
+    new CronJob(
+      '0 */1 * * * *',
+      getUpdatedNotionActionItems,
+      null,
+      false,
+      null,
+      null,
+      false,
+      offset,
+    ),
+  notionActionItemsDefaults: (offset) =>
+    new CronJob(
+      '*/5 * * * * *',
+      setTasksDefaultStatus,
+      null,
+      false,
+      null,
+      null,
+      false,
+      offset,
+    ),
   // notionGoalsItems: new CronJob(
   //   '*/5 * * * * *',
   //   getUpdatedNotionGoals,
@@ -66,15 +99,20 @@ const crons = {
 
 const exportedValues = {};
 
-exportedValues.startAllCrons = () => {
+const activeCrons = {};
+
+exportedValues.startAllCrons = async () => {
+  await storage.init();
+  const timeZoneOffset = +(await storage.get('timeZoneOffset'));
   Object.keys(crons).forEach((key) => {
-    crons[key].start();
+    activeCrons[key] = crons[key](timeZoneOffset);
+    activeCrons[key].start();
   });
 };
 
 exportedValues.stopAllCrons = () => {
   Object.keys(crons).forEach((key) => {
-    crons[key].stop();
+    activeCrons[key].stop();
   });
 };
 
