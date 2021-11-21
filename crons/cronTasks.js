@@ -151,7 +151,6 @@ exportedValues.getUpdatedNotionGoals = async () => {
   const currentTime = moment().subtract(2, 'minutes').seconds(0);
   response.data.results.forEach((item) => {
     if (moment(item.last_edited_time).isSame(currentTime, 'minutes')) {
-      console.log(item);
       // processUpdatedItem(item);
     }
   });

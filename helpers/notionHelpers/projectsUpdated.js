@@ -4,7 +4,7 @@ const {
   deleteProject,
 } = require('../../interfaces/todoistInterface');
 
-const upsertProject = require('./notionProjectsHelpers');
+const {upsertProject} = require('./notionProjectsHelpers');
 
 const actionItemUpdates = {};
 

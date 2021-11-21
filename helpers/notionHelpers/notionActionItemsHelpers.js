@@ -5,6 +5,7 @@ const {
   getPageContent,
   getBlockChildren,
 } = require('../../interfaces/notionInterface');
+const {getProjectByTodoistId} = require('./notionProjectsHelpers');
 const {deleteTask} = require('../../interfaces/todoistInterface');
 
 const {ACTION_ITEMS_DATABASE_ID} = process.env;
@@ -62,7 +63,23 @@ actionItemsValues.getActionItem = async (item) => {
 };
 
 actionItemsValues.createNewActionItem = async (item) => {
-  const properties = makeActionItemBody(item);
+  let properties = makeActionItemBody(item);
+
+  if (item.project_id) {
+    const project = await getProjectByTodoistId(item.project_id);
+    if (project) {
+      properties = {
+        ...properties,
+        Project: {
+          relation: [
+            {
+              id: project.id,
+            },
+          ],
+        },
+      };
+    }
+  }
   await createPage(ACTION_ITEMS_DATABASE_ID, {properties});
   deleteTask(item.id);
 };

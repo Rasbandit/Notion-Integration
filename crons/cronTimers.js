@@ -56,7 +56,7 @@ const crons = {
     ),
   syncTodoist: (offset) =>
     new CronJob(
-      '*/3 * * * * *',
+      '*/5 * * * * *',
       getUpdatedTodoistItems,
       null,
       false,
