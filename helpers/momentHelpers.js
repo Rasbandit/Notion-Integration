@@ -25,3 +25,6 @@ exportedValues.yearMonthDayFormat = (date) => moment(date).format('YYYY-MM-DD');
 exportedValues.formatDayTitle = (date) => moment(date).format('MMM D, YYYY');
 
 module.exports = exportedValues;
+
+console.log(exportedValues.localTime());
+console.log(moment.utc());
