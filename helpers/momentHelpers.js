@@ -11,6 +11,10 @@ const init = async () => {
     await storage.setItem('timeZoneOffset', '-6');
   }
   offset = await storage.getItem('timeZoneOffset');
+
+  console.log(offset);
+  console.log(exportedValues.localTime());
+  console.log(moment.utc());
 };
 
 init();
@@ -25,6 +29,3 @@ exportedValues.yearMonthDayFormat = (date) => moment(date).format('YYYY-MM-DD');
 exportedValues.formatDayTitle = (date) => moment(date).format('MMM D, YYYY');
 
 module.exports = exportedValues;
-
-console.log(exportedValues.localTime());
-console.log(moment.utc());
