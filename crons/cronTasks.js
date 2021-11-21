@@ -120,7 +120,7 @@ exportedValues.getUpdatedProjects = async () => {
     page_size: 60,
   };
   const response = await queryDatabase(PROJECT_DATABASE_ID, search);
-  const currentTime = moment().subtract(2, 'minutes').seconds(0);
+  const currentTime = moment().seconds(0);
   response.data.results.forEach((item) => {
     if (moment(item.last_edited_time).isSame(currentTime, 'minutes')) {
       processUpdatedItem(item);
