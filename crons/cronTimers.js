@@ -5,9 +5,7 @@ const {
   createNextWeek,
   setEatingData,
   getUpdatedTodoistItems,
-  getUpdatedNotionActionItems,
   createNextDay,
-  setTasksDefaultStatus,
 } = require('./cronTasks');
 
 const crons = {
@@ -33,7 +31,7 @@ const crons = {
       false,
       offset,
     ),
-  createNextWeekCron: (offset) =>
+  createNewWeekCron: (offset) =>
     new CronJob(
       '0 0 1 * * 6',
       createNextWeek,
@@ -46,7 +44,7 @@ const crons = {
     ),
   createNewDayCron: (offset) =>
     new CronJob(
-      '0 20 * * *',
+      '0 21 * * *',
       createNextDay,
       null,
       false,
@@ -66,28 +64,28 @@ const crons = {
       false,
       offset,
     ),
-  notionActionItems: (offset) =>
-    new CronJob(
-      '0 */1 * * * *',
-      getUpdatedNotionActionItems,
-      null,
-      false,
-      null,
-      null,
-      false,
-      offset,
-    ),
-  notionActionItemsDefaults: (offset) =>
-    new CronJob(
-      '*/5 * * * * *',
-      setTasksDefaultStatus,
-      null,
-      false,
-      null,
-      null,
-      false,
-      offset,
-    ),
+  // notionActionItems: (offset) =>
+  //   new CronJob(
+  //     '0 */1 * * * *',
+  //     getUpdatedNotionActionItems,
+  //     null,
+  //     false,
+  //     null,
+  //     null,
+  //     false,
+  //     offset,
+  //   ),
+  // notionActionItemsDefaults: (offset) =>
+  //   new CronJob(
+  //     '*/5 * * * * *',
+  //     setTasksDefaultStatus,
+  //     null,
+  //     false,
+  //     null,
+  //     null,
+  //     false,
+  //     offset,
+  //   ),
   // notionGoalsItems: new CronJob(
   //   '*/5 * * * * *',
   //   getUpdatedNotionGoals,

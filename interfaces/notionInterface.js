@@ -19,7 +19,6 @@ exportedValues.createPage = async (database_id, values) => {
       database_id,
     },
   };
-  console.log(body);
   return await notionInstance.post('/pages', body);
 };
 

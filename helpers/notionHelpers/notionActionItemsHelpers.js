@@ -3,10 +3,9 @@ const {
   queryDatabase,
   updatePage,
   getPageContent,
-  updateBlock,
-  appendBlock,
   getBlockChildren,
 } = require('../../interfaces/notionInterface');
+const {deleteTask} = require('../../interfaces/todoistInterface');
 
 const {ACTION_ITEMS_DATABASE_ID} = process.env;
 
@@ -15,16 +14,7 @@ const TODOIST_DESCRIPTION = 'Todoist Description';
 const actionItemsValues = {};
 
 actionItemsValues.routeActionItem = async (item) => {
-  const matchingItem = await actionItemsValues.getActionItem(item);
-
-  if (matchingItem) {
-    const {id: childBlockId} = await actionItemsValues.getDescriptionBlock(
-      matchingItem.id,
-    );
-    if (changesNeededActionItem(matchingItem, item)) {
-      actionItemsValues.updateActionItem(matchingItem.id, childBlockId, item);
-    }
-  } else if (!matchingItem && !item.is_deleted) {
+  if (!item.is_deleted && !item.date_completed) {
     actionItemsValues.createNewActionItem(item);
   }
 };
@@ -73,23 +63,8 @@ actionItemsValues.getActionItem = async (item) => {
 
 actionItemsValues.createNewActionItem = async (item) => {
   const properties = makeActionItemBody(item);
-  const children = [makeDescriptionToggle(item)];
-  await createPage(ACTION_ITEMS_DATABASE_ID, {properties, children});
-};
-
-actionItemsValues.updateActionItem = async (pageId, blockId, item) => {
-  if (blockId) {
-    await updateBlock(blockId, makeDescriptionText(item));
-  } else {
-    await appendBlock(pageId, {children: [makeDescriptionToggle(item)]});
-  }
-
-  const updates = {
-    archived: !!item.is_deleted,
-    properties: makeActionItemBody(item),
-  };
-
-  await updatePage(pageId, updates);
+  await createPage(ACTION_ITEMS_DATABASE_ID, {properties});
+  deleteTask(item.id);
 };
 
 actionItemsValues.setDefaultStatus = async (pageId) => {
@@ -106,29 +81,6 @@ actionItemsValues.setDefaultStatus = async (pageId) => {
   await updatePage(pageId, updates);
 };
 
-const makeDescriptionToggle = (item) => ({
-  type: 'toggle',
-  toggle: {
-    text: [
-      {
-        type: 'text',
-        text: {
-          content: TODOIST_DESCRIPTION,
-          link: null,
-        },
-      },
-    ],
-    children: [makeDescriptionText(item)],
-  },
-});
-
-const makeDescriptionText = (item) => ({
-  type: 'paragraph',
-  paragraph: {
-    text: [{type: 'text', text: {content: item.description}}],
-  },
-});
-
 const makeActionItemBody = (item) => ({
   Name: {
     title: [
@@ -136,6 +88,15 @@ const makeActionItemBody = (item) => ({
         type: 'text',
         text: {
           content: item.content,
+        },
+      },
+    ],
+  },
+  Description: {
+    rich_text: [
+      {
+        text: {
+          content: item.description,
         },
       },
     ],
@@ -155,42 +116,6 @@ const makeActionItemBody = (item) => ({
       name: item.priority,
     },
   },
-  Done: {
-    checkbox: !!item.date_completed,
-  },
-  'Todoist Id': {
-    number: item.id,
-  },
 });
-
-const changesNeededActionItem = (existingItem, updatedItem) => {
-  const {properties} = existingItem;
-  let different = false;
-
-  if (properties?.Done?.checkbox !== !!updatedItem?.date_completed)
-    different = true;
-
-  if (properties?.['Todoist Id']?.number !== updatedItem?.id) different = true;
-
-  if (properties?.Priority?.select?.name !== updatedItem?.priority)
-    different = true;
-
-  if (properties?.Name?.title?.[0]?.plain_text !== updatedItem?.content)
-    different = true;
-
-  if (!areLabelsTheSame(properties?.Context?.multi_select, updatedItem?.labels))
-    different = true;
-
-  if (properties?.['Due Date']?.date?.start !== updatedItem?.due?.date)
-    different = true;
-
-  if (existingItem?.pageContent !== updatedItem?.description) different = true;
-
-  return different;
-};
-
-const areLabelsTheSame = (existingLabels, newLabels) =>
-  existingLabels.length === newLabels.length &&
-  existingLabels.every(({name}) => newLabels.includes(name));
 
 module.exports = actionItemsValues;

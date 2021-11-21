@@ -19,7 +19,7 @@ exportedValues.updateOffset = async () => {
   offset = await storage.getItem('timeZoneOffset');
 };
 
-exportedValues.localTime = () => moment.utc().utcOffset(offset);
+exportedValues.localTime = () => moment.utc().add(+offset, 'hour');
 exportedValues.onlyDate = (date) => moment(date).format().split('T')[0];
 exportedValues.yearMonthDayFormat = (date) => moment(date).format('YYYY-MM-DD');
 exportedValues.formatDayTitle = (date) => moment(date).format('MMM D, YYYY');
