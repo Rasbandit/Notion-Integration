@@ -6,6 +6,7 @@ const {
   setEatingData,
   getUpdatedTodoistItems,
   createNextDay,
+  getUpdatedProjects,
 } = require('./cronTasks');
 
 const crons = {
@@ -64,17 +65,17 @@ const crons = {
       false,
       offset,
     ),
-  // notionActionItems: (offset) =>
-  //   new CronJob(
-  //     '0 */1 * * * *',
-  //     getUpdatedNotionActionItems,
-  //     null,
-  //     false,
-  //     null,
-  //     null,
-  //     false,
-  //     offset,
-  //   ),
+  notionProjects: (offset) =>
+    new CronJob(
+      '0 */1 * * * *',
+      getUpdatedProjects,
+      null,
+      false,
+      null,
+      null,
+      false,
+      offset,
+    ),
   // notionActionItemsDefaults: (offset) =>
   //   new CronJob(
   //     '*/5 * * * * *',

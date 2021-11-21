@@ -45,6 +45,15 @@ exportedValues.closeTask = async (taskId) =>
 exportedValues.deleteTask = async (taskId) =>
   todoistRestInterface.delete(`/tasks/${taskId}`);
 
+exportedValues.deleteProject = async (projectId) =>
+  todoistRestInterface.delete(`/projects/${projectId}`);
+
+exportedValues.createProject = async (body) =>
+  todoistRestInterface.post(`/projects`, body);
+
+exportedValues.updateProject = async (projectId, body) =>
+  todoistRestInterface.post(`/projects/${projectId}`, body);
+
 exportedValues.getAllLabels = async () => todoistRestInterface.get(`/labels`);
 
 module.exports = exportedValues;
