@@ -65,6 +65,7 @@ const getAndProcessOuraData = async (offset) => {
         'Total Sleep Minute': sleepData.totalSleepMinuets,
         'Sleep Score': sleepData.score,
         Steps: activityData.steps,
+        'Calories Burned': activityData.cal_total,
       },
     });
   }
