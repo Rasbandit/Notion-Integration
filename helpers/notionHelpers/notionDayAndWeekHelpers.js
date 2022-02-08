@@ -1,3 +1,4 @@
+const {default: axios} = require('axios');
 const moment = require('moment-timezone');
 const emoji = require('random-happy-emoji');
 
@@ -18,6 +19,14 @@ const {
 
 const values = {};
 
+async function FetchImage(width, height, type) {
+  const res = await axios.get(
+    `https://source.unsplash.com/${width}x${height}/?${type}`,
+  );
+  if (res.status === 200) return res.request._redirectable._currentUrl;
+  return '';
+}
+
 values.createNewDay = async (date, weekId, children = []) => {
   const pageObj = {
     icon: {
@@ -27,7 +36,7 @@ values.createNewDay = async (date, weekId, children = []) => {
     cover: {
       type: 'external',
       external: {
-        url: 'https://source.unsplash.com/random/1500x500',
+        url: await FetchImage(1500, 500, 'happy'),
       },
     },
     properties: {
@@ -97,7 +106,13 @@ values.createNextWeek = async () => {
       ],
     },
   };
-  await createPage(WEEK_DATABASE_ID, {properties});
+  await createPage(WEEK_DATABASE_ID, {
+    icon: {
+      type: 'emoji',
+      emoji: emoji(),
+    },
+    properties,
+  });
 };
 
 values.createNewSection = async (startDate) => {
@@ -137,7 +152,13 @@ values.createNewSection = async (startDate) => {
       ],
     },
   };
-  const results = await createPage(SECTION_DATABASE_ID, {properties});
+  const results = await createPage(SECTION_DATABASE_ID, {
+    icon: {
+      type: 'emoji',
+      emoji: emoji(),
+    },
+    properties,
+  });
   return results.data;
 };
 
@@ -166,7 +187,13 @@ values.createPeriod = async (startDate) => {
       },
     },
   };
-  const result = await createPage(PERIOD_DATABASE_ID, {properties});
+  const result = await createPage(PERIOD_DATABASE_ID, {
+    icon: {
+      type: 'emoji',
+      emoji: emoji(),
+    },
+    properties,
+  });
   return result.data;
 };
 
