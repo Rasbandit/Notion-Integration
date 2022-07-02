@@ -42,7 +42,7 @@ const routeOnLabel = async (item) => {
 const processTaskUpdates = async (item) => {
   let copyItem = {...item};
   copyItem.labels = await convertLabelIdToLabelName(item);
-  copyItem = formatPriority(item);
+  copyItem = formatPriority(copyItem);
   routeOnLabel(copyItem);
 };
 
