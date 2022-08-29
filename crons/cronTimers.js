@@ -54,17 +54,17 @@ const crons = {
       false,
       offset,
     ),
-  syncTodoist: (offset) =>
-    new CronJob(
-      '*/5 * * * * *',
-      getUpdatedTodoistItems,
-      null,
-      false,
-      null,
-      null,
-      false,
-      offset,
-    ),
+  // syncTodoist: (offset) =>
+  //   new CronJob(
+  //     '*/5 * * * * *',
+  //     getUpdatedTodoistItems,
+  //     null,
+  //     false,
+  //     null,
+  //     null,
+  //     false,
+  //     offset,
+  //   ),
   notionProjects: (offset) =>
     new CronJob(
       '0 */1 * * * *',
